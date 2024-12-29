@@ -51,6 +51,9 @@ public class LootFiltersOverlay extends Overlay {
                     continue;
                 }
 
+                if (tile.getItemLayer() == null) {
+                    continue;
+                }
                 var textPoint = getCanvasTextLocation(client, g, loc, name, tile.getItemLayer().getHeight());
                 if (textPoint == null) {
                     continue;

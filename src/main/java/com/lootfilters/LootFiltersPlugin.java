@@ -40,7 +40,7 @@ public class LootFiltersPlugin extends Plugin
 	@Getter private List<FilterConfig> filterConfigs;
 
     public LootFiltersPlugin() {
-		this.groundItems = new HashMap<>();
+		groundItems = new HashMap<>();
 	}
 
 	@Override
@@ -48,6 +48,7 @@ public class LootFiltersPlugin extends Plugin
 		overlayManager.add(overlay);
 
 		filterConfigs = FilterConfig.fromJson(config.filterConfig());
+		groundItems.clear();
 	}
 
 	@Override
