@@ -32,18 +32,28 @@ public class LootFiltersOverlay extends Overlay {
     @Override
     public Dimension render(Graphics2D g) {
         var texts = new HashMap<Tile, TextComponent>();
+        var filters = plugin.getFilters();
         for (var entry: plugin.getGroundItems().entrySet()) {
             var tile = entry.getKey();
             var offset = 0;
             for (var item: entry.getValue()) {
-                offset += 20;
+                var match = filters.stream()
+                        .filter(it -> it.test(item))
+                        .findFirst().orElse(null);
+                if (match == null) {
+                    continue;
+                }
+
+                var display = match.getDisplay();
                 var name = itemManager.getItemComposition(item.getId()).getName();
 
                 var loc = LocalPoint.fromWorld(client, tile.getWorldLocation());
                 var textPoint = Perspective.getCanvasTextLocation(client, g, loc, name, tile.getItemLayer().getHeight());
 
+                offset += 20; // configurize this
                 var text = new TextComponent();
                 text.setText(name);
+                text.setColor(display.getColor());
                 text.setPosition(new Point(textPoint.getX(), textPoint.getY() - offset));
                 text.render(g);
             }
