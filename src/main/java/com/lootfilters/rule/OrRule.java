@@ -8,16 +8,16 @@ import net.runelite.api.TileItem;
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = false)
-public class AndRule extends Rule {
+public class OrRule extends Rule {
     private final List<Rule> rules;
 
-    public AndRule(List<Rule> rules) {
-        super("and");
+    public OrRule(List<Rule> rules) {
+        super("or");
         this.rules = rules;
     }
 
     @Override
     public boolean test(LootFiltersPlugin plugin, TileItem item) {
-        return rules.stream().allMatch(it -> it.test(plugin, item));
+        return rules.stream().anyMatch(it -> it.test(plugin, item));
     }
 }

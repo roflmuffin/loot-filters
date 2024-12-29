@@ -5,6 +5,7 @@ import com.lootfilters.rule.ItemIdRule;
 import com.lootfilters.rule.ItemNameRule;
 import com.lootfilters.rule.ItemQuantityRule;
 import com.lootfilters.rule.ItemValueRule;
+import com.lootfilters.rule.OrRule;
 
 import java.awt.Color;
 import java.util.List;
@@ -18,10 +19,17 @@ public class FilterSerdeTest {
                 new FilterConfig(new ItemValueRule(1_000, Comparator.LT), new DisplayConfig(Color.BLUE, false, true)),
                 new FilterConfig(new ItemQuantityRule(1_000, Comparator.LT), new DisplayConfig(Color.WHITE, false, false)),
                 new FilterConfig(
-                        new AndRule(
+                        new AndRule(List.of(
                                 new ItemNameRule("Coins"),
                                 new ItemQuantityRule(5, Comparator.EQ)
-                        ),
+                        )),
+                        new DisplayConfig(Color.WHITE.darker(), false, true)
+                ),
+                new FilterConfig(
+                        new OrRule(List.of(
+                                new ItemNameRule("Coins"),
+                                new ItemQuantityRule(9, Comparator.EQ)
+                        )),
                         new DisplayConfig(Color.WHITE.darker(), false, true)
                 )
         );
