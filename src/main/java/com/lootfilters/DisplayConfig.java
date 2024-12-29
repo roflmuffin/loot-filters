@@ -1,11 +1,14 @@
 package com.lootfilters;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.awt.Color;
 
+@Getter
+@EqualsAndHashCode
 public class DisplayConfig {
-    @Getter private final Color color;
+    private final Color color;
     private final boolean hidden;
 
     public DisplayConfig(Color color, boolean hidden) {

@@ -1,7 +1,11 @@
 package com.lootfilters;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import net.runelite.api.TileItem;
 
+@Getter
+@EqualsAndHashCode
 public class Filter {
     private final Rule rule;
     private final DisplayConfig display;
@@ -13,9 +17,5 @@ public class Filter {
 
     public boolean test(TileItem item) {
         return rule.test(item);
-    }
-
-    public DisplayConfig getDisplay() {
-        return display;
     }
 }
