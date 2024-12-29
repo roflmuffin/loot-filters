@@ -4,8 +4,6 @@ import com.google.inject.Provides;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
-import net.runelite.api.Tile;
-import net.runelite.api.TileItem;
 import net.runelite.api.events.ItemDespawned;
 import net.runelite.api.events.ItemSpawned;
 import net.runelite.client.callback.ClientThread;
@@ -18,10 +16,7 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @PluginDescriptor(
@@ -38,7 +33,7 @@ public class LootFiltersPlugin extends Plugin
 	@Inject private ConfigManager configManager;
 	@Inject private ItemManager itemManager;
 
-	private final Map<Tile, List<TileItem>> groundItems = new HashMap<>();
+	private final TileItemIndex tileItemIndex = new TileItemIndex();
 	private final LootbeamIndex lootbeamIndex = new LootbeamIndex();
 
 	private List<FilterConfig> filterConfigs;
@@ -53,7 +48,8 @@ public class LootFiltersPlugin extends Plugin
 	@Override
 	protected void shutDown() throws Exception {
 		overlayManager.remove(overlay);
-		groundItems.clear();
+
+		tileItemIndex.clear();
 		lootbeamIndex.clear();
 	}
 
@@ -73,10 +69,7 @@ public class LootFiltersPlugin extends Plugin
 	public void onItemSpawned(ItemSpawned event) {
 		var tile = event.getTile();
 		var item = event.getItem();
-		if (!groundItems.containsKey(tile)) {
-			groundItems.put(tile, new ArrayList<>());
-		}
-		groundItems.get(tile).add(item);
+		tileItemIndex.put(tile, item);
 
 		// lootbeams
 		var match = filterConfigs.stream()
@@ -93,17 +86,8 @@ public class LootFiltersPlugin extends Plugin
 	@Subscribe
 	public void onItemDespawned(ItemDespawned event) {
 		var tile = event.getTile();
-		if (!groundItems.containsKey(tile)) {
-			return; // what?
-		}
-
 		var item = event.getItem();
-		var items = groundItems.get(tile);
-		items.remove(item);
-		if (items.isEmpty()) {
-			groundItems.remove(tile);
-		}
-
+		tileItemIndex.remove(tile, item);
 		lootbeamIndex.remove(tile, item); // idempotent, we don't care if there wasn't a beam
 	}
 }

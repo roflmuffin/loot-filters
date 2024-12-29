@@ -32,7 +32,7 @@ public class LootFiltersOverlay extends Overlay {
     @Override
     public Dimension render(Graphics2D g) {
         var filters = plugin.getFilterConfigs();
-        for (var entry: plugin.getGroundItems().entrySet()) {
+        for (var entry: plugin.getTileItemIndex().entrySet()) {
             var tile = entry.getKey();
             var offset = 0;
             for (var item: entry.getValue()) {
@@ -59,7 +59,7 @@ public class LootFiltersOverlay extends Overlay {
                     continue;
                 }
 
-                offset += 20; // configurize this
+                offset += 16; // configurize this
                 var text = new TextComponent();
                 text.setText(name);
                 text.setFont(getRunescapeSmallFont());

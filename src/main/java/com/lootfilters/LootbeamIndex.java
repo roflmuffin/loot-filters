@@ -7,11 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class LootbeamIndex {
-    private final Map<Tile, Map<TileItem, Lootbeam>> index;
-
-    public LootbeamIndex() {
-        index = new HashMap<>();
-    }
+    private final Map<Tile, Map<TileItem, Lootbeam>> index = new HashMap<>();
 
     public void put(Tile tile, TileItem item, Lootbeam beam) {
         if (!index.containsKey(tile)) {
