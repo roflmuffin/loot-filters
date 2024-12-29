@@ -8,6 +8,7 @@ import net.runelite.api.Tile;
 import net.runelite.api.TileItem;
 import net.runelite.api.events.ItemDespawned;
 import net.runelite.api.events.ItemSpawned;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
@@ -26,34 +27,34 @@ import java.util.Map;
 @PluginDescriptor(
 	name = "Loot Filters"
 )
+@Getter
 public class LootFiltersPlugin extends Plugin
 {
 	@Inject private Client client;
+	@Inject private ClientThread clientThread;
 	@Inject private LootFiltersConfig config;
 	@Inject private LootFiltersOverlay overlay;
 	@Inject private OverlayManager overlayManager;
 	@Inject private ConfigManager configManager;
-	@Inject @Getter private ItemManager itemManager;
+	@Inject private ItemManager itemManager;
 
-	@Getter private final Map<Tile, List<TileItem>> groundItems;
+	private final Map<Tile, List<TileItem>> groundItems = new HashMap<>();
+	private final LootbeamIndex lootbeamIndex = new LootbeamIndex();
 
-	@Getter private List<FilterConfig> filterConfigs;
-
-    public LootFiltersPlugin() {
-		groundItems = new HashMap<>();
-	}
+	private List<FilterConfig> filterConfigs;
 
 	@Override
 	protected void startUp() throws Exception {
 		overlayManager.add(overlay);
 
 		filterConfigs = FilterConfig.fromJson(config.filterConfig());
-		groundItems.clear();
 	}
 
 	@Override
 	protected void shutDown() throws Exception {
 		overlayManager.remove(overlay);
+		groundItems.clear();
+		lootbeamIndex.clear();
 	}
 
 	@Provides
@@ -76,6 +77,17 @@ public class LootFiltersPlugin extends Plugin
 			groundItems.put(tile, new ArrayList<>());
 		}
 		groundItems.get(tile).add(item);
+
+		// lootbeams
+		var match = filterConfigs.stream()
+				.filter(it -> it.test(this, item))
+				.findFirst().orElse(null);
+		if (match == null || !match.getDisplay().isShowLootbeam()) {
+			return;
+		}
+
+		var beam = new Lootbeam(client, clientThread, tile.getWorldLocation(), match.getDisplay().getColor(), Lootbeam.Style.MODERN);
+		lootbeamIndex.put(tile, item, beam);
 	}
 
 	@Subscribe
@@ -91,5 +103,7 @@ public class LootFiltersPlugin extends Plugin
 		if (items.isEmpty()) {
 			groundItems.remove(tile);
 		}
+
+		lootbeamIndex.remove(tile, item); // idempotent, we don't care if there wasn't a beam
 	}
 }
