@@ -53,10 +53,6 @@ public class LootFiltersPlugin extends Plugin
 	protected void startUp() throws Exception {
 		overlayManager.add(overlay);
 
-		if (itemManager == null) {
-			System.out.println("fucked");
-		}
-
 		this.filters = List.of( // testing
 				new Filter(new ItemNameRule(this, "Torva platebody"), new DisplayConfig(Color.CYAN, false)),
 				new Filter(new ItemNameRule(this, "Torva platelegs"), new DisplayConfig(Color.PINK, false))
