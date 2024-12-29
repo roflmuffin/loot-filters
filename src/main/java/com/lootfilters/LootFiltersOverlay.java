@@ -1,9 +1,6 @@
 package com.lootfilters;
 
 import net.runelite.api.Client;
-import net.runelite.api.Perspective;
-import net.runelite.api.Tile;
-import net.runelite.api.coords.LocalPoint;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.components.TextComponent;
@@ -12,7 +9,10 @@ import javax.inject.Inject;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.util.HashMap;
+
+import static net.runelite.api.Perspective.getCanvasTextLocation;
+import static net.runelite.api.coords.LocalPoint.fromWorld;
+import static net.runelite.client.ui.FontManager.getRunescapeSmallFont;
 
 public class LootFiltersOverlay extends Overlay {
     private final Client client;
@@ -31,14 +31,13 @@ public class LootFiltersOverlay extends Overlay {
 
     @Override
     public Dimension render(Graphics2D g) {
-        var texts = new HashMap<Tile, TextComponent>();
-        var filters = plugin.getFilters();
+        var filters = plugin.getFilterConfigs();
         for (var entry: plugin.getGroundItems().entrySet()) {
             var tile = entry.getKey();
             var offset = 0;
             for (var item: entry.getValue()) {
                 var match = filters.stream()
-                        .filter(it -> it.test(item))
+                        .filter(it -> it.test(plugin, item))
                         .findFirst().orElse(null);
                 if (match == null) {
                     continue;
@@ -47,12 +46,16 @@ public class LootFiltersOverlay extends Overlay {
                 var display = match.getDisplay();
                 var name = itemManager.getItemComposition(item.getId()).getName();
 
-                var loc = LocalPoint.fromWorld(client, tile.getWorldLocation());
-                var textPoint = Perspective.getCanvasTextLocation(client, g, loc, name, tile.getItemLayer().getHeight());
+                var loc = fromWorld(client, tile.getWorldLocation());
+                var textPoint = getCanvasTextLocation(client, g, loc, name, tile.getItemLayer().getHeight());
+                if (textPoint == null) {
+                    continue;
+                }
 
                 offset += 20; // configurize this
                 var text = new TextComponent();
                 text.setText(name);
+                text.setFont(getRunescapeSmallFont());
                 text.setColor(display.getColor());
                 text.setPosition(new Point(textPoint.getX(), textPoint.getY() - offset));
                 text.render(g);

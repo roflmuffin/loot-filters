@@ -3,13 +3,11 @@ package com.lootfilters;
 import net.runelite.api.TileItem;
 
 public abstract class Rule {
-    protected transient final LootFiltersPlugin plugin;
     protected final String discriminator; // serde discriminator
 
-    protected Rule(LootFiltersPlugin plugin, String discriminator) {
-        this.plugin = plugin;
+    protected Rule(String discriminator) {
         this.discriminator = discriminator;
     }
 
-    public abstract boolean test(TileItem item);
+    public abstract boolean test(LootFiltersPlugin plugin, TileItem item);
 }

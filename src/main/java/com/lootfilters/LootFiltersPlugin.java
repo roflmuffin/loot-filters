@@ -1,24 +1,26 @@
 package com.lootfilters;
 
 import com.google.inject.Provides;
-import javax.inject.Inject;
-
-import com.lootfilters.rule.ItemNameRule;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.*;
+import net.runelite.api.Client;
+import net.runelite.api.Tile;
+import net.runelite.api.TileItem;
 import net.runelite.api.events.ItemDespawned;
 import net.runelite.api.events.ItemSpawned;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 
-import java.awt.*;
-import java.util.*;
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @PluginDescriptor(
@@ -33,19 +35,11 @@ public class LootFiltersPlugin extends Plugin
 	@Inject private ConfigManager configManager;
 	@Inject @Getter private ItemManager itemManager;
 
-	private final Map<Tile, List<TileItem>> groundItems;
+	@Getter private final Map<Tile, List<TileItem>> groundItems;
 
-	private List<Filter> filters;
+	@Getter private List<FilterConfig> filterConfigs;
 
-	public Map<Tile, List<TileItem>> getGroundItems() {
-		return groundItems;
-	}
-
-	public List<Filter> getFilters() {
-		return filters;
-	}
-
-	public LootFiltersPlugin() {
+    public LootFiltersPlugin() {
 		this.groundItems = new HashMap<>();
 	}
 
@@ -53,10 +47,7 @@ public class LootFiltersPlugin extends Plugin
 	protected void startUp() throws Exception {
 		overlayManager.add(overlay);
 
-		this.filters = List.of( // testing
-				new Filter(new ItemNameRule(this, "Torva platebody"), new DisplayConfig(Color.CYAN, false)),
-				new Filter(new ItemNameRule(this, "Torva platelegs"), new DisplayConfig(Color.PINK, false))
-		);
+		filterConfigs = FilterConfig.fromJson(config.filterConfig());
 	}
 
 	@Override
@@ -67,6 +58,13 @@ public class LootFiltersPlugin extends Plugin
 	@Provides
 	LootFiltersConfig provideConfig(ConfigManager configManager) {
 		return configManager.getConfig(LootFiltersConfig.class);
+	}
+
+	@Subscribe
+	public void onConfigChanged(ConfigChanged event) {
+		if (event.getGroup().equals("loot-filters")) {
+			filterConfigs = FilterConfig.fromJson(config.filterConfig());
+		}
 	}
 
 	@Subscribe

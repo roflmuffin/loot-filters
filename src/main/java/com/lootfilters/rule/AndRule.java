@@ -11,18 +11,18 @@ import java.util.List;
 public class AndRule extends Rule {
     private final List<Rule> rules;
 
-    public AndRule(LootFiltersPlugin plugin, List<Rule> rules) {
-        super(plugin, "and");
+    public AndRule(List<Rule> rules) {
+        super("and");
         this.rules = rules;
     }
 
-    public AndRule(LootFiltersPlugin plugin, Rule... rules) {
-        super(plugin, "and");
+    public AndRule(Rule... rules) {
+        super("and");
         this.rules = List.of(rules);
     }
 
     @Override
-    public boolean test(TileItem item) {
-        return rules.stream().allMatch(it -> it.test(item));
+    public boolean test(LootFiltersPlugin plugin, TileItem item) {
+        return rules.stream().allMatch(it -> it.test(plugin, item));
     }
 }

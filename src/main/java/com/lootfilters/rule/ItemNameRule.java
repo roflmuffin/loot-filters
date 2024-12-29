@@ -9,13 +9,13 @@ import net.runelite.api.TileItem;
 public class ItemNameRule extends Rule {
     private final String name;
 
-    public ItemNameRule(LootFiltersPlugin plugin, String name) {
-        super(plugin, "item_name");
+    public ItemNameRule(String name) {
+        super("item_name");
         this.name = name;
     }
 
     @Override
-    public boolean test(TileItem item) {
+    public boolean test(LootFiltersPlugin plugin, TileItem item) {
         return plugin.getItemManager().getItemComposition(item.getId()).getName().equals(name);
     }
 }

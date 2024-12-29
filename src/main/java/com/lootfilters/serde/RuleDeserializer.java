@@ -1,6 +1,7 @@
-package com.lootfilters;
+package com.lootfilters.serde;
 
 import com.google.gson.*;
+import com.lootfilters.Rule;
 import com.lootfilters.rule.*;
 
 import java.lang.reflect.Type;

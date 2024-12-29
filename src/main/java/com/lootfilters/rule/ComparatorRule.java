@@ -9,15 +9,15 @@ public abstract class ComparatorRule extends Rule {
     private final int rhs;
     private final Comparator cmp;
 
-    protected ComparatorRule(LootFiltersPlugin plugin, String discriminator, int rhs, Comparator cmp) {
-        super(plugin, discriminator);
+    protected ComparatorRule(String discriminator, int rhs, Comparator cmp) {
+        super(discriminator);
         this.rhs = rhs;
         this.cmp = cmp;
     }
 
     @Override
-    public final boolean test(TileItem item) {
-        var lhs = getLhs(item);
+    public final boolean test(LootFiltersPlugin plugin, TileItem item) {
+        var lhs = getLhs(plugin, item);
         switch (cmp) {
             case GT:
                 return lhs > rhs;
@@ -33,5 +33,5 @@ public abstract class ComparatorRule extends Rule {
         return false;
     }
 
-    public abstract int getLhs(TileItem item);
+    public abstract int getLhs(LootFiltersPlugin plugin, TileItem item);
 }
