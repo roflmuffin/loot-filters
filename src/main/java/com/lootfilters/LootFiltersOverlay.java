@@ -9,6 +9,7 @@ import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.TextComponent;
 
 import javax.inject.Inject;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -96,20 +97,31 @@ public class LootFiltersOverlay extends Overlay {
 
                 text.render(g);
 
-                // despawn time
-                // TODO: configurize
-                // var ticksRemaining = item.getDespawnTime() - client.getTickCount();
-                // if (ticksRemaining < 0) { // doesn't despawn
-                //     continue;
-                // }
-                // text.setText(Integer.toString(ticksRemaining));
-                // text.setPosition(new Point(textPoint.getX() + textWidth + 2 + 1, textPoint.getY() - currentOffset));
-                text.render(g);
+                if (display.isShowDespawn()) {
+                    var ticksRemaining = item.getDespawnTime() - client.getTickCount();
+                    if (ticksRemaining < 0) { // doesn't despawn
+                        continue;
+                    }
+                    text.setColor(getDespawnTextColor(item));
+                    text.setText(Integer.toString(ticksRemaining));
+                    text.setPosition(new Point(textPoint.getX() + textWidth + 2 + 1, textPoint.getY() - currentOffset));
+                    text.render(g);
+                }
 
                 currentOffset += Z_STACK_OFFSET;
             }
         }
         return null;
+    }
+
+    private Color getDespawnTextColor(TileItem item) {
+        if (item.getDespawnTime() - client.getTickCount() < 100) {
+            return Color.RED;
+        }
+        if (item.getVisibleTime() <= client.getTickCount()) {
+            return Color.YELLOW;
+        }
+        return Color.GREEN;
     }
 
     private String buildDisplayText(TileItem item, DisplayConfig display) {
