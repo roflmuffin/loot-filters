@@ -14,23 +14,23 @@ import java.util.Objects;
 public class FilterSerdeTest {
     public static void main(String[] args) throws Exception {
         var filters = List.of(
-                new FilterConfig(new ItemIdRule(1), new DisplayConfig(Color.RED, false, false)),
-                new FilterConfig(new ItemNameRule("bandos-crossbow"), new DisplayConfig(Color.GREEN, false, true)),
-                new FilterConfig(new ItemValueRule(1_000, Comparator.LT), new DisplayConfig(Color.BLUE, false, true)),
-                new FilterConfig(new ItemQuantityRule(1_000, Comparator.LT), new DisplayConfig(Color.WHITE, false, false)),
+                new FilterConfig(new ItemIdRule(1), new DisplayConfig(Color.RED)),
+                new FilterConfig(new ItemNameRule("bandos-crossbow"), new DisplayConfig(Color.GREEN)),
+                new FilterConfig(new ItemValueRule(1_000, Comparator.LT), new DisplayConfig(Color.BLUE)),
+                new FilterConfig(new ItemQuantityRule(1_000, Comparator.LT), new DisplayConfig(Color.WHITE)),
                 new FilterConfig(
                         new AndRule(List.of(
                                 new ItemNameRule("Coins"),
                                 new ItemQuantityRule(5, Comparator.EQ)
                         )),
-                        new DisplayConfig(Color.WHITE.darker(), false, true)
+                        new DisplayConfig(Color.WHITE.darker())
                 ),
                 new FilterConfig(
                         new OrRule(List.of(
                                 new ItemNameRule("Coins"),
                                 new ItemQuantityRule(9, Comparator.EQ)
                         )),
-                        new DisplayConfig(Color.WHITE.darker(), false, true)
+                        new DisplayConfig(Color.WHITE.darker())
                 )
         );
 

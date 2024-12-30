@@ -63,9 +63,7 @@ The following filter syntax re-implements the item value display colors supporte
 
 ## todo
 * feature: filter language
-* feature: rule config: OR rule
 * feature: display config: deprioritize right-click menu
 * feature: display config: despawn timers
 * feature?: display config: font size
 * fix: reflow lootbeam display on filter config update
-* fix: item_value rule needs to account for quantity

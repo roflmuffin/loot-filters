@@ -1,6 +1,7 @@
 package com.lootfilters;
 
 import net.runelite.api.Client;
+import net.runelite.api.TileItem;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.components.TextComponent;
@@ -39,12 +40,12 @@ public class LootFiltersOverlay extends Overlay {
                 var match = filters.stream()
                         .filter(it -> it.test(plugin, item))
                         .findFirst().orElse(null);
-                if (match == null) {
+                if (match == null || match.getDisplay().isHidden()) {
                     continue;
                 }
 
                 var display = match.getDisplay();
-                var name = itemManager.getItemComposition(item.getId()).getName();
+                var displayText = buildDisplayText(item, display);
 
                 var loc = fromWorld(client, tile.getWorldLocation());
                 if (loc == null) {
@@ -54,14 +55,14 @@ public class LootFiltersOverlay extends Overlay {
                 if (tile.getItemLayer() == null) {
                     continue;
                 }
-                var textPoint = getCanvasTextLocation(client, g, loc, name, tile.getItemLayer().getHeight());
+                var textPoint = getCanvasTextLocation(client, g, loc, displayText, tile.getItemLayer().getHeight());
                 if (textPoint == null) {
                     continue;
                 }
 
                 offset += 16; // configurize this
                 var text = new TextComponent();
-                text.setText(name);
+                text.setText(displayText);
                 text.setFont(getRunescapeSmallFont());
                 text.setColor(display.getColor());
                 text.setPosition(new Point(textPoint.getX(), textPoint.getY() - offset));
@@ -69,5 +70,30 @@ public class LootFiltersOverlay extends Overlay {
             }
         }
         return null;
+    }
+
+    private String buildDisplayText(TileItem item, DisplayConfig display) {
+        var text = itemManager.getItemComposition(item.getId()).getName();
+        if (display.isShowQuantity()) {
+            text += " (" + item.getQuantity() + ")";
+        }
+        if (display.isShowValue()) {
+            var value = itemManager.getItemPrice(item.getId()) * item.getQuantity();
+            text += " (" + getValueText(value) + ")";
+        }
+        return text;
+    }
+
+    private String getValueText(int value) {
+        if (value >= 1e9) { // > 1b
+            return String.format("%.2fB", (float)value / 1e9);
+        } else if (value >= 1e8) { // > 100m
+            return String.format("%.0fM", (float)value / 1e6);
+        } else if (value >= 1e6) { // > 1m
+            return String.format("%.1fM", (float)value / 1e6);
+        } else if (value >= 1e5) { // > 100k
+            return String.format("%.0fK", (float)value / 1e3);
+        }
+        return value + "gp";
     }
 }

@@ -13,6 +13,6 @@ public class ItemValueRule extends ComparatorRule {
 
     @Override
     public int getLhs(LootFiltersPlugin plugin, TileItem item) {
-        return plugin.getItemManager().getItemPrice(item.getId());
+        return plugin.getItemManager().getItemPrice(item.getId()) * item.getQuantity();
     }
 }
