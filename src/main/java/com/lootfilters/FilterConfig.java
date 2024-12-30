@@ -2,6 +2,7 @@ package com.lootfilters;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.lootfilters.rule.Rule;
 import com.lootfilters.serde.ColorDeserializer;
 import com.lootfilters.serde.ColorSerializer;
 import com.lootfilters.serde.RuleDeserializer;

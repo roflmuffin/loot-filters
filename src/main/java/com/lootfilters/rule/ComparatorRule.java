@@ -1,8 +1,6 @@
 package com.lootfilters.rule;
 
 import com.lootfilters.LootFiltersPlugin;
-import com.lootfilters.Comparator;
-import com.lootfilters.Rule;
 import net.runelite.api.TileItem;
 
 public abstract class ComparatorRule extends Rule {

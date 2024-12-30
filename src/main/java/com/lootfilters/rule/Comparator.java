@@ -1,4 +1,4 @@
-package com.lootfilters;
+package com.lootfilters.rule;
 
 public enum Comparator {
     GT,

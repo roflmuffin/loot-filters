@@ -1,6 +1,7 @@
 package com.lootfilters;
 
 import com.lootfilters.rule.AndRule;
+import com.lootfilters.rule.Comparator;
 import com.lootfilters.rule.ItemIdRule;
 import com.lootfilters.rule.ItemNameRule;
 import com.lootfilters.rule.ItemQuantityRule;

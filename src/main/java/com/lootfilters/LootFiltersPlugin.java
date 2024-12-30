@@ -79,7 +79,7 @@ public class LootFiltersPlugin extends Plugin
 			return;
 		}
 
-		var beam = new Lootbeam(client, clientThread, tile.getWorldLocation(), match.getDisplay().getColor(), Lootbeam.Style.MODERN);
+		var beam = new Lootbeam(client, clientThread, tile.getWorldLocation(), match.getDisplay().getTextColor(), Lootbeam.Style.MODERN);
 		lootbeamIndex.put(tile, item, beam);
 	}
 

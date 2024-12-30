@@ -41,6 +41,9 @@ import java.util.function.Function;
 
 // copied verbatim (including copyright notice & disclaimer) from
 // https://github.com/runelite/runelite/blob/master/runelite-client/src/main/java/net/runelite/client/plugins/grounditems/Lootbeam.java
+//
+// local modifications:
+// remove() - wrapped setActive() call in clientThread.invoke(), where setActive must be called (throws otherwise)
 class Lootbeam
 {
     private final RuneLiteObject runeLiteObject;
@@ -147,7 +150,7 @@ class Lootbeam
 
     public void remove()
     {
-        runeLiteObject.setActive(false);
+        clientThread.invoke(() -> runeLiteObject.setActive(false));
     }
 
 }

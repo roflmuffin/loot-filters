@@ -8,15 +8,19 @@ import java.awt.Color;
 @Getter
 @EqualsAndHashCode
 public class DisplayConfig {
-    private final Color color;
+    private final Color textColor;
+    private final Color backgroundColor;
+    private final Color borderColor;
     private final boolean hidden;
     private final boolean showLootbeam;
     private final boolean showQuantity;
     private final boolean showValue;
     private final boolean showDespawn;
 
-    public DisplayConfig(Color color) {
-        this.color = color;
+    public DisplayConfig(Color textColor) {
+        this.textColor = textColor;
+        backgroundColor = null;
+        borderColor = null;
         hidden = false;
         showLootbeam = false;
         showQuantity = false;
@@ -24,13 +28,15 @@ public class DisplayConfig {
         showDespawn = false;
     }
 
-    public DisplayConfig(Color color,
+    public DisplayConfig(Color textColor, Color backgroundColor, Color borderColor,
                          boolean hidden,
                          boolean showLootBeam,
                          boolean showQuantity,
                          boolean showValue,
                          boolean showDespawn) {
-        this.color = color;
+        this.textColor = textColor;
+        this.backgroundColor = backgroundColor;
+        this.borderColor = borderColor;
         this.hidden = hidden;
         this.showLootbeam = showLootBeam;
         this.showQuantity = showQuantity;

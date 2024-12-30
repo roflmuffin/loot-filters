@@ -1,7 +1,6 @@
 package com.lootfilters.rule;
 
 import com.lootfilters.LootFiltersPlugin;
-import com.lootfilters.Rule;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import net.runelite.api.TileItem;

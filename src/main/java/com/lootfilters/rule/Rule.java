@@ -1,5 +1,6 @@
-package com.lootfilters;
+package com.lootfilters.rule;
 
+import com.lootfilters.LootFiltersPlugin;
 import net.runelite.api.TileItem;
 
 public abstract class Rule {
