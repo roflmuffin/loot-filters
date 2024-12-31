@@ -63,7 +63,9 @@ The following filter syntax re-implements the item value display colors supporte
 
 ## todo
 * feature: filter language
-* feature: display config: deprioritize right-click menu
-* feature: display config: despawn timers
+* feature: ground items parity: recolor / add quantity to menu items
+* feature: ground items parity: ownership filter
+* feature: display config: global overrides
 * feature?: display config: font size
+* feature?: ground items parity: global "hide" list
 * fix: reflow lootbeam display on filter config update
