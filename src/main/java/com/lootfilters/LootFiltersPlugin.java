@@ -23,6 +23,8 @@ import javax.inject.Inject;
 import java.util.List;
 
 import static com.lootfilters.FilterConfig.findMatch;
+import static com.lootfilters.util.TextUtil.getBaseDisplayText;
+import static net.runelite.client.util.ColorUtil.wrapWithColorTag;
 
 @Slf4j
 @PluginDescriptor(
@@ -106,12 +108,15 @@ public class LootFiltersPlugin extends Plugin
 				continue;
 			}
 
-			var x = entry.getParam0();
-			var y = entry.getParam1();
-			var point = WorldPoint.fromScene(wv, x, y, wv.getPlane());
+			var point = WorldPoint.fromScene(wv, entry.getParam0(), entry.getParam1(), wv.getPlane());
 			var item = tileItemIndex.findItem(point, entry.getIdentifier());
 			var match = findMatch(filterConfigs, this, item);
-			entry.setDeprioritized(match == null || match.isHidden());
+			if (match != null && !match.isHidden()) {
+				var text = getBaseDisplayText(item, itemManager.getItemComposition(item.getId()).getName());
+				entry.setTarget(wrapWithColorTag(text, match.getTextColor()));
+			} else {
+				entry.setDeprioritized(true);
+			}
 		}
 	}
 
