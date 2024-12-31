@@ -35,6 +35,14 @@ public class FilterConfig {
         return gson.fromJson(json, new TypeToken<ArrayList<FilterConfig>>() {}.getType());
     }
 
+    public static DisplayConfig findMatch(List<FilterConfig> filters, LootFiltersPlugin plugin, TileItem item) {
+        var match = filters.stream()
+                .filter(it -> it.rule.test(plugin, item))
+                .findFirst()
+                .orElse(null);
+        return match != null ? match.display : null;
+    }
+
     public FilterConfig(Rule rule, DisplayConfig display) {
         this.rule = rule;
         this.display = display;

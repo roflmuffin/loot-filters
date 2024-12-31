@@ -13,7 +13,6 @@ public class DisplayConfig {
     private final Color borderColor;
     private final boolean hidden;
     private final boolean showLootbeam;
-    private final boolean showQuantity;
     private final boolean showValue;
     private final boolean showDespawn;
 
@@ -23,7 +22,6 @@ public class DisplayConfig {
         borderColor = null;
         hidden = false;
         showLootbeam = false;
-        showQuantity = false;
         showValue = false;
         showDespawn = false;
     }
@@ -31,7 +29,6 @@ public class DisplayConfig {
     public DisplayConfig(Color textColor, Color backgroundColor, Color borderColor,
                          boolean hidden,
                          boolean showLootBeam,
-                         boolean showQuantity,
                          boolean showValue,
                          boolean showDespawn) {
         this.textColor = textColor;
@@ -39,7 +36,6 @@ public class DisplayConfig {
         this.borderColor = borderColor;
         this.hidden = hidden;
         this.showLootbeam = showLootBeam;
-        this.showQuantity = showQuantity;
         this.showValue = showValue;
         this.showDespawn = showDespawn;
     }

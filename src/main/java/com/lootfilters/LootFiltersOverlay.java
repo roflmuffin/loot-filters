@@ -126,7 +126,7 @@ public class LootFiltersOverlay extends Overlay {
 
     private String buildDisplayText(TileItem item, DisplayConfig display) {
         var text = itemManager.getItemComposition(item.getId()).getName();
-        if (display.isShowQuantity()) {
+        if (item.getQuantity() > 1) {
             text += " (" + item.getQuantity() + ")";
         }
         if (display.isShowValue()) {

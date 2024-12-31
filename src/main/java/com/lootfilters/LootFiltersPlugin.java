@@ -4,6 +4,10 @@ import com.google.inject.Provides;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.MenuAction;
+import net.runelite.api.MenuEntry;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.ClientTick;
 import net.runelite.api.events.ItemDespawned;
 import net.runelite.api.events.ItemSpawned;
 import net.runelite.client.callback.ClientThread;
@@ -17,6 +21,8 @@ import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
 import java.util.List;
+
+import static com.lootfilters.FilterConfig.findMatch;
 
 @Slf4j
 @PluginDescriptor(
@@ -89,5 +95,32 @@ public class LootFiltersPlugin extends Plugin
 		var item = event.getItem();
 		tileItemIndex.remove(tile, item);
 		lootbeamIndex.remove(tile, item); // idempotent, we don't care if there wasn't a beam
+	}
+
+	@Subscribe
+	public void onClientTick(ClientTick event) {
+		var entries = client.getMenu().getMenuEntries();
+		var wv = client.getTopLevelWorldView();
+		for (var entry : entries) {
+			if (!isGroundItem(entry)) {
+				continue;
+			}
+
+			var x = entry.getParam0();
+			var y = entry.getParam1();
+			var point = WorldPoint.fromScene(wv, x, y, wv.getPlane());
+			var item = tileItemIndex.findItem(point, entry.getIdentifier());
+			var match = findMatch(filterConfigs, this, item);
+			entry.setDeprioritized(match == null || match.isHidden());
+		}
+	}
+
+	private boolean isGroundItem(MenuEntry entry) {
+		var type = entry.getType();
+		return type == MenuAction.GROUND_ITEM_FIRST_OPTION
+				|| type == MenuAction.GROUND_ITEM_SECOND_OPTION
+				|| type == MenuAction.GROUND_ITEM_THIRD_OPTION
+				|| type == MenuAction.GROUND_ITEM_FOURTH_OPTION
+				|| type == MenuAction.GROUND_ITEM_FIFTH_OPTION;
 	}
 }
