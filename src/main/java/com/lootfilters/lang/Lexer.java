@@ -25,7 +25,9 @@ public class Lexer {
             entry("||", Token.Type.OP_OR),
             entry(";", Token.Type.STMT_END),
             entry("true", Token.Type.TRUE),
-            entry("false", Token.Type.FALSE)
+            entry("false", Token.Type.FALSE),
+            entry("if", Token.Type.IF),
+            entry(":", Token.Type.COLON)
     );
 
     private final String input;

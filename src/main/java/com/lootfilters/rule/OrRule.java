@@ -15,6 +15,11 @@ public class OrRule extends Rule {
         this.rules = rules;
     }
 
+    public OrRule(Rule left, Rule right) {
+        super("or");
+        this.rules = List.of(left, right);
+    }
+
     @Override
     public boolean test(LootFiltersPlugin plugin, TileItem item) {
         return rules.stream().anyMatch(it -> it.test(plugin, item));

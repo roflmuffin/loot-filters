@@ -8,13 +8,12 @@ import lombok.Value;
 public class Token {
     public enum Type {
         WHITESPACE,
-        TRUE,
-        FALSE,
+        IF,
+        COLON,
+        TRUE, FALSE,
         IDENTIFIER,
-        LITERAL_INT,
-        LITERAL_STRING,
-        OP_EQ, OP_GT, OP_LT, OP_GTEQ, OP_LTEQ,
-        OP_AND, OP_OR,
+        LITERAL_INT, LITERAL_STRING,
+        OP_EQ, OP_GT, OP_LT, OP_GTEQ, OP_LTEQ, OP_AND, OP_OR,
         EXPR_START, EXPR_END,
         STMT_END,
     }
@@ -38,4 +37,16 @@ public class Token {
 
     Type type;
     String value;
+
+    public boolean is(Type type) {
+        return this.type == type;
+    }
+
+    @Override
+    public String toString() {
+        var str = "Token{type=" + type;
+        return value.isEmpty()
+                ? str + "}"
+                : str + ",value=" + value + "}";
+    }
 }

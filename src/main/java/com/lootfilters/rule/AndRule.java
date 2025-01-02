@@ -15,6 +15,11 @@ public class AndRule extends Rule {
         this.rules = rules;
     }
 
+    public AndRule(Rule left, Rule right) {
+        super("and");
+        this.rules = List.of(left, right);
+    }
+
     @Override
     public boolean test(LootFiltersPlugin plugin, TileItem item) {
         return rules.stream().allMatch(it -> it.test(plugin, item));
