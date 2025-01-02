@@ -4,147 +4,117 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import static com.lootfilters.util.TextUtil.isLegalIdent;
+import static com.lootfilters.util.TextUtil.isNumeric;
+import static com.lootfilters.util.TextUtil.isWhitespace;
+import static java.util.Map.entry;
 
 @RequiredArgsConstructor
-// TODO: this code is so fucking bad
 public class Lexer {
+    private static final Map<String, Token.Type> STATICS = Map.ofEntries(
+            entry("(", Token.Type.EXPR_START),
+            entry(")", Token.Type.EXPR_END),
+            entry("==", Token.Type.OP_EQ),
+            entry(">", Token.Type.OP_GT),
+            entry("<", Token.Type.OP_LT),
+            entry(">=", Token.Type.OP_GTEQ),
+            entry("<=", Token.Type.OP_LTEQ),
+            entry("&&", Token.Type.OP_AND),
+            entry("||", Token.Type.OP_OR),
+            entry(";", Token.Type.STMT_END),
+            entry("true", Token.Type.TRUE),
+            entry("false", Token.Type.FALSE)
+    );
+
     private final String input;
+    private final List<Token> tokens = new ArrayList<>();
+    private int offset = 0;
 
-    // do this:
-    // private final Map<String, Token.Type> STATICS = Map.of("(", Token.Type.EXPR_START)); // etc.
-    // first thing tokenize() should do is check that, THEN try to figure out literals/dynamic tokens
-
-    // terribly written, making tokens/offset members will improve
-    // switch + if is improvised nonsense
     public List<Token> tokenize() throws Exception {
-        var tokens = new ArrayList<Token>();
-        var offset = 0;
         while (offset < input.length()) {
-            var ch = input.charAt(offset);
-            switch (ch) {
-                case ' ':
-                case '\t':
-                case '\n':
-                    var ws = tokenizeWhitespace(offset);
-                    tokens.add(ws);
-                    offset += ws.getValue().length();
-                    continue;
-                case '(':
-                    tokens.add(new Token(Token.Type.EXPR_START, "("));
-                    ++offset;
-                    continue;
-                case ')':
-                    tokens.add(new Token(Token.Type.EXPR_END, ")"));
-                    ++offset;
-                    continue;
-                case '"':
-                    var ls = tokenizeLiteralString(offset);
-                    tokens.add(ls);
-                    offset += ls.getValue().length()+2;
-                    continue;
-                case ';':
-                    tokens.add(new Token(Token.Type.STMT_END, ";"));
-                    ++offset;
-                    continue;
-                case '>':
-                    tokens.add(new Token(Token.Type.OPERATOR_GT, ">"));
-                    ++offset;
-                    continue;
-                case '<':
-                    tokens.add(new Token(Token.Type.OPERATOR_LT, "<"));
-                    ++offset;
-                    continue;
+            if (tokenizeStatic()) {
+                continue;
             }
-            if (input.startsWith("&&", offset)) {
-               tokens.add(new Token(Token.Type.OPERATOR_AND, "&&"));
-               offset += 2;
-            } else if (input.startsWith("||", offset)) {
-                tokens.add(new Token(Token.Type.OPERATOR_OR, "||"));
-                offset += 2;
-            } else if (input.startsWith("true", offset)) {
-                tokens.add(new Token(Token.Type.LITERAL_BOOL, "true"));
-                offset += 4;
-            } else if (input.startsWith("false", offset)) {
-                tokens.add(new Token(Token.Type.LITERAL_BOOL, "false"));
-                offset += 5;
-            } else if (ch >= '0' && ch <= '9') {
-                var tok = tokenizeLiteralInt(offset);
-                tokens.add(tok);
-                offset += tok.getValue().length();
-            } else if (input.startsWith("RULE", offset)) {
-                tokens.add(new Token(Token.Type.KEYWORD, "RULE"));
-                offset += 4;
-            } else if (input.startsWith("CFG", offset)) {
-                tokens.add(new Token(Token.Type.KEYWORD, "CFG"));
-                offset += 4;
-            } else if (input.startsWith("==", offset)) {
-                tokens.add(new Token(Token.Type.OPERATOR_EQ, "=="));
-                offset += 2;
-            } else if (input.startsWith(">=", offset)) {
-                tokens.add(new Token(Token.Type.OPERATOR_GTEQ, ">="));
-                offset += 2;
-            } else if (input.startsWith("<=", offset)) {
-                tokens.add(new Token(Token.Type.OPERATOR_LTEQ, "<="));
-                offset += 2;
+
+            var ch = input.charAt(offset);
+            if (isWhitespace(ch)) {
+                tokenizeWhitespace();
+            } else if (isNumeric(ch)) {
+                tokenizeLiteralInt();
+            } else if (ch == '"') {
+                tokenizeLiteralString();
+            } else if (isLegalIdent(ch)) {
+                tokenizeIdentifier();
             } else {
-                var tok = tokenizeIdentifier(offset);
-                tokens.add(tok);
-                offset += tok.getValue().length();
+                throw new Exception("unrecognized character '" + ch + "'");
             }
         }
+
         return tokens;
     }
 
-    private Token tokenizeWhitespace(int start) {
-        for (int i = start; i < input.length(); ++i) {
+    private boolean tokenizeStatic() {
+        for (var entry : STATICS.entrySet()) {
+            var value = entry.getKey();
+            var type = entry.getValue();
+            if (input.startsWith(value, offset)) {
+                tokens.add(Token.Static(type));
+                offset += value.length();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void tokenizeWhitespace() {
+        for (int i = offset; i < input.length(); ++i) {
             if (!isWhitespace(input.charAt(i))) {
-                return new Token(Token.Type.WHITESPACE, input.substring(start, i));
+                tokens.add(Token.Whitespace);
+                offset += i - offset;
+                return;
             }
         }
-        return new Token(Token.Type.WHITESPACE, input.substring(start));
+        tokens.add(Token.Whitespace);
+        offset = input.length();
     }
 
-    private Token tokenizeLiteralInt(int start) {
-        for (int i = start; i < input.length(); ++i) {
+    private void tokenizeLiteralInt() {
+        for (int i = offset; i < input.length(); ++i) {
             if (!isNumeric(input.charAt(i))) {
-                return new Token(Token.Type.LITERAL_INT, input.substring(start, i));
+                var literal = input.substring(offset, i);
+                tokens.add(Token.IntLiteral(literal));
+                offset += literal.length();
+                return;
             }
         }
-        return new Token(Token.Type.LITERAL_INT, input.substring(start));
+        tokens.add(Token.IntLiteral(input.substring(offset)));
+        offset = input.length();
     }
 
-    private Token tokenizeLiteralString(int start) throws Exception {
-        for (int i = start+1; i < input.length(); ++i) {
+    private void tokenizeLiteralString() throws Exception {
+        for (int i = offset+1; i < input.length(); ++i) {
             if (input.charAt(i) == '"') {
-                var literal = input.substring(start+1, i);
-                return new Token(Token.Type.LITERAL_STRING, literal);
+                var literal = input.substring(offset+1, i);
+                tokens.add(Token.StringLiteral(literal));
+                offset += literal.length() + 2; // for quotes, which the captured literal omits
+                return;
             }
         }
         throw new Exception("unterminated string literal");
     }
 
-    private Token tokenizeIdentifier(int start) throws Exception {
-        for (int i = start; i < input.length(); ++i) {
-            if (!isLegal(input.charAt(i))) {
-                return new Token(Token.Type.IDENTIFIER, input.substring(start, i));
+    private void tokenizeIdentifier() {
+        for (int i = offset; i < input.length(); ++i) {
+            if (!isLegalIdent(input.charAt(i))) {
+                var ident = input.substring(offset, i);
+                tokens.add(Token.Identifier(ident));
+                offset += ident.length();
+                return;
             }
         }
-        return new Token(Token.Type.IDENTIFIER, input.substring(start));
-    }
-
-    private boolean isWhitespace(char c) {
-        return c == ' ' || c == '\t' || c == '\n';
-    }
-
-    private boolean isNumeric(char c) {
-        return c >= '0' && c <= '9';
-    }
-
-    private boolean isAlpha(char c) {
-        return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z';
-    }
-
-    private boolean isLegal(char c) { // for identifiers
-        return c == '_' || isAlpha(c) || isNumeric(c);
+        tokens.add(Token.Identifier(input.substring(offset)));
+        offset = input.length();
     }
 }
