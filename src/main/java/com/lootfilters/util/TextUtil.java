@@ -2,6 +2,8 @@ package com.lootfilters.util;
 
 import net.runelite.api.TileItem;
 
+import java.awt.Color;
+
 public class TextUtil {
     private TextUtil() {}
 
@@ -27,5 +29,9 @@ public class TextUtil {
 
     public static boolean isLegalIdent(char c) {
         return c == '_' || isAlpha(c) || isNumeric(c);
+    }
+
+    public static Color parseArgb(String argb) {
+        return new Color(Long.decode("0x" + argb).intValue(), true);
     }
 }

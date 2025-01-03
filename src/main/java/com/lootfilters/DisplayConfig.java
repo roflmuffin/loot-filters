@@ -1,14 +1,20 @@
 package com.lootfilters;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.awt.Color;
 
 @Getter
+@Builder
+@AllArgsConstructor
 @EqualsAndHashCode
 public class DisplayConfig {
-    private final Color textColor;
+    @Builder.Default
+    private final Color textColor = Color.WHITE;
+
     private final Color backgroundColor;
     private final Color borderColor;
     private final boolean hidden;
@@ -24,19 +30,5 @@ public class DisplayConfig {
         showLootbeam = false;
         showValue = false;
         showDespawn = false;
-    }
-
-    public DisplayConfig(Color textColor, Color backgroundColor, Color borderColor,
-                         boolean hidden,
-                         boolean showLootBeam,
-                         boolean showValue,
-                         boolean showDespawn) {
-        this.textColor = textColor;
-        this.backgroundColor = backgroundColor;
-        this.borderColor = borderColor;
-        this.hidden = hidden;
-        this.showLootbeam = showLootBeam;
-        this.showValue = showValue;
-        this.showDespawn = showDespawn;
     }
 }

@@ -13,8 +13,10 @@ public class Token {
         TRUE, FALSE,
         IDENTIFIER,
         LITERAL_INT, LITERAL_STRING,
+        ASSIGN,
         OP_EQ, OP_GT, OP_LT, OP_GTEQ, OP_LTEQ, OP_AND, OP_OR,
         EXPR_START, EXPR_END,
+        BLOCK_START, BLOCK_END,
         STMT_END,
     }
 
@@ -42,10 +44,33 @@ public class Token {
         return this.type == type;
     }
 
+    public int expectInt() {
+        if (type != Type.LITERAL_INT) {
+            throw new ParseException("unexpected non-int token", this);
+        }
+        return Integer.parseInt(value);
+    }
+
+    public String expectString() {
+        if (type != Type.LITERAL_STRING) {
+            throw new ParseException("unexpected non-string token", this);
+        }
+        return value;
+    }
+
+    public boolean expectBoolean() {
+        switch (type) {
+            case TRUE: return true;
+            case FALSE: return false;
+            default:
+                throw new ParseException("unexpected non-boolean token", this);
+        }
+    }
+
     @Override
     public String toString() {
         var str = "Token{type=" + type;
-        return value.isEmpty()
+        return value != null && value.isEmpty()
                 ? str + "}"
                 : str + ",value=" + value + "}";
     }

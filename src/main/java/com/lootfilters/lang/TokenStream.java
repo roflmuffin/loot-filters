@@ -10,14 +10,14 @@ import java.util.function.Consumer;
 public class TokenStream {
     private final List<Token> tokens;
 
-    public Token peekFirst() {
+    public Token peek() {
         return tokens.stream()
                 .filter(it -> !it.is(Token.Type.WHITESPACE))
                 .findFirst()
                 .orElse(null);
     }
 
-    public Token takeFirst() {
+    public Token take() {
         while (isNotEmpty()) {
             var next = tokens.remove(0);
             if (next.getType() != Token.Type.WHITESPACE) {
@@ -27,10 +27,25 @@ public class TokenStream {
         return null;
     }
 
-    public Token takeExpectFirst(Token.Type expect) {
-        var first = takeFirst();
+    public Token takeExpect(Token.Type expect) {
+        if (tokens.isEmpty()) {
+            throw new ParseException("unexpected end of token stream");
+        }
+
+        var first = take();
         if (!first.is(expect)) {
-            throw new ParseException("expected token type " + first.getType(), first);
+            throw new ParseException("unexpected non-" + expect + " token", first);
+        }
+        return first;
+    }
+
+    public Token takeExpectLiteral() {
+        var first = take();
+        if (!first.is(Token.Type.LITERAL_INT)
+                && !first.is(Token.Type.LITERAL_STRING)
+                && !first.is(Token.Type.TRUE)
+                && !first.is(Token.Type.FALSE)) {
+            throw new ParseException("unexpected non-literal token", first);
         }
         return first;
     }
@@ -43,12 +58,12 @@ public class TokenStream {
     // For now that is not the case, expressions have distinct syntaxes, except there's only the one which is for Rule.
     public void walkExpression(Consumer<Token> consumer) throws ParseException {
         var state = new Stack<Token>();
-        if (!peekFirst().is(Token.Type.EXPR_START)) {
-            throw new ParseException("unexpected start of expression", peekFirst());
+        if (!peek().is(Token.Type.EXPR_START)) {
+            throw new ParseException("unexpected start of expression", peek());
         }
 
         while (isNotEmpty()) {
-            var next = takeFirst();
+            var next = take();
             if (next.is(Token.Type.EXPR_START)) {
                 state.push(next);
             } else if (next.is(Token.Type.EXPR_END)) {

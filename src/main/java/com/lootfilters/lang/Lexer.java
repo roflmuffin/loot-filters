@@ -27,7 +27,10 @@ public class Lexer {
             entry("true", Token.Type.TRUE),
             entry("false", Token.Type.FALSE),
             entry("if", Token.Type.IF),
-            entry(":", Token.Type.COLON)
+            entry(":", Token.Type.COLON),
+            entry("{", Token.Type.BLOCK_START),
+            entry("}", Token.Type.BLOCK_END),
+            entry("=", Token.Type.ASSIGN)
     );
 
     private final String input;
