@@ -1,6 +1,8 @@
 package com.lootfilters;
 
 import com.google.inject.Provides;
+import com.lootfilters.lang.Lexer;
+import com.lootfilters.lang.Parser;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
@@ -20,11 +22,14 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.lootfilters.FilterConfig.findMatch;
-import static com.lootfilters.util.TextUtil.getBaseDisplayText;
-import static net.runelite.client.util.ColorUtil.wrapWithColorTag;
+import static net.runelite.client.util.ColorUtil.colorTag;
 
 @Slf4j
 @PluginDescriptor(
@@ -50,7 +55,7 @@ public class LootFiltersPlugin extends Plugin
 	protected void startUp() throws Exception {
 		overlayManager.add(overlay);
 
-		filterConfigs = FilterConfig.fromJson(config.filterConfig());
+		filterConfigs = new Parser(new Lexer(config.filterConfig()).tokenize()).parse();
 	}
 
 	@Override
@@ -67,9 +72,9 @@ public class LootFiltersPlugin extends Plugin
 	}
 
 	@Subscribe
-	public void onConfigChanged(ConfigChanged event) {
+	public void onConfigChanged(ConfigChanged event) throws Exception {
 		if (event.getGroup().equals("loot-filters")) {
-			filterConfigs = FilterConfig.fromJson(config.filterConfig());
+			filterConfigs = new Parser(new Lexer(config.filterConfig()).tokenize()).parse();
 		}
 	}
 
@@ -103,7 +108,25 @@ public class LootFiltersPlugin extends Plugin
 	public void onClientTick(ClientTick event) {
 		var entries = client.getMenu().getMenuEntries();
 		var wv = client.getTopLevelWorldView();
+		var seen = new HashMap<MenuEntry, Boolean>();
+		var itemCounts = Stream.of(entries)
+				.filter(this::isGroundItem)
+				.collect(Collectors.groupingBy(it -> it, Collectors.counting()));
+
+		var newEntries = new ArrayList<MenuEntry>();
 		for (var entry : entries) {
+			if (seen.containsKey(entry)) {
+				continue;
+			}
+			if (!isGroundItem(entry)) {
+				newEntries.add(entry);
+				continue;
+			}
+
+			seen.put(entry, true);
+			newEntries.add(entry);
+		}
+		for (var entry : newEntries) {
 			if (!isGroundItem(entry)) {
 				continue;
 			}
@@ -112,12 +135,16 @@ public class LootFiltersPlugin extends Plugin
 			var item = tileItemIndex.findItem(point, entry.getIdentifier());
 			var match = findMatch(filterConfigs, this, item);
 			if (match != null && !match.isHidden()) {
-				var text = getBaseDisplayText(item, itemManager.getItemComposition(item.getId()).getName());
-				entry.setTarget(wrapWithColorTag(text, match.getTextColor()));
+				if (itemCounts.get(entry) > 1) {
+					entry.setTarget(colorTag(match.getTextColor()) + itemManager.getItemComposition(item.getId()).getName() + " x" + itemCounts.get(entry));
+				} else if (!entry.getTarget().startsWith(colorTag(match.getTextColor()))) { // shitty idempotency
+					entry.setTarget(colorTag(match.getTextColor()) + itemManager.getItemComposition(item.getId()).getName());
+				}
 			} else {
 				entry.setDeprioritized(true);
 			}
 		}
+		client.getMenu().setMenuEntries(newEntries.toArray(MenuEntry[]::new));
 	}
 
 	private boolean isGroundItem(MenuEntry entry) {
@@ -126,6 +153,7 @@ public class LootFiltersPlugin extends Plugin
 				|| type == MenuAction.GROUND_ITEM_SECOND_OPTION
 				|| type == MenuAction.GROUND_ITEM_THIRD_OPTION
 				|| type == MenuAction.GROUND_ITEM_FOURTH_OPTION
-				|| type == MenuAction.GROUND_ITEM_FIFTH_OPTION;
+				|| type == MenuAction.GROUND_ITEM_FIFTH_OPTION
+				|| type == MenuAction.EXAMINE_ITEM_GROUND;
 	}
 }

@@ -3,35 +3,34 @@ package com.lootfilters.lang;
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import static com.lootfilters.util.TextUtil.isLegalIdent;
 import static com.lootfilters.util.TextUtil.isNumeric;
 import static com.lootfilters.util.TextUtil.isWhitespace;
-import static java.util.Map.entry;
 
 @RequiredArgsConstructor
 public class Lexer {
-    private static final Map<String, Token.Type> STATICS = Map.ofEntries(
-            entry("(", Token.Type.EXPR_START),
-            entry(")", Token.Type.EXPR_END),
-            entry("==", Token.Type.OP_EQ),
-            entry(">", Token.Type.OP_GT),
-            entry("<", Token.Type.OP_LT),
-            entry(">=", Token.Type.OP_GTEQ),
-            entry("<=", Token.Type.OP_LTEQ),
-            entry("&&", Token.Type.OP_AND),
-            entry("||", Token.Type.OP_OR),
-            entry(";", Token.Type.STMT_END),
-            entry("true", Token.Type.TRUE),
-            entry("false", Token.Type.FALSE),
-            entry("if", Token.Type.IF),
-            entry(":", Token.Type.COLON),
-            entry("{", Token.Type.BLOCK_START),
-            entry("}", Token.Type.BLOCK_END),
-            entry("=", Token.Type.ASSIGN)
-    );
+    private static final LinkedHashMap<String, Token.Type> STATICS = new LinkedHashMap<>() {{
+        put("(", Token.Type.EXPR_START);
+        put(")", Token.Type.EXPR_END);
+        put("==", Token.Type.OP_EQ);
+        put(">", Token.Type.OP_GT);
+        put("<", Token.Type.OP_LT);
+        put(">=", Token.Type.OP_GTEQ);
+        put("<=", Token.Type.OP_LTEQ);
+        put("&&", Token.Type.OP_AND);
+        put("||", Token.Type.OP_OR);
+        put(";", Token.Type.STMT_END);
+        put("true", Token.Type.TRUE);
+        put("false", Token.Type.FALSE);
+        put("if", Token.Type.IF);
+        put(":", Token.Type.COLON);
+        put("{", Token.Type.BLOCK_START);
+        put("}", Token.Type.BLOCK_END);
+        put("=", Token.Type.ASSIGN);
+    }};
 
     private final String input;
     private final List<Token> tokens = new ArrayList<>();

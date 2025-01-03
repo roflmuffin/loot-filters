@@ -13,7 +13,9 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.util.stream.Collectors;
 
+import static com.lootfilters.util.TextUtil.getValueText;
 import static net.runelite.api.Perspective.getCanvasTextLocation;
 import static net.runelite.client.ui.FontManager.getRunescapeSmallFont;
 
@@ -39,10 +41,19 @@ public class LootFiltersOverlay extends Overlay {
     @Override
     public Dimension render(Graphics2D g) {
         var filters = plugin.getFilterConfigs();
-        for (var entry: plugin.getTileItemIndex().entrySet()) {
+        for (var entry : plugin.getTileItemIndex().entrySet()) {
+            var items = entry.getValue();
+            var itemCounts = items.stream()
+                    .collect(Collectors.groupingBy(TileItem::getId, Collectors.counting()));
+
             var tile = entry.getKey();
             var currentOffset = 0;
-            for (var item: entry.getValue()) {
+            for (var id : itemCounts.keySet()) {
+                var count = itemCounts.get(id);
+                var item = items.stream()
+                        .filter(it -> it.getId() == id)
+                        .findFirst().orElseThrow();
+
                 var match = filters.stream()
                         .filter(it -> it.test(plugin, item))
                         .findFirst().orElse(null);
@@ -51,7 +62,7 @@ public class LootFiltersOverlay extends Overlay {
                 }
 
                 var display = match.getDisplay();
-                var displayText = buildDisplayText(item, display);
+                var displayText = buildDisplayText(item, count, display);
 
                 var loc = LocalPoint.fromWorld(client.getTopLevelWorldView(), tile.getWorldLocation());
                 if (loc == null) {
@@ -124,34 +135,20 @@ public class LootFiltersOverlay extends Overlay {
         return Color.GREEN;
     }
 
-    private String buildDisplayText(TileItem item, DisplayConfig display) {
+    private String buildDisplayText(TileItem item, long unstackedCount, DisplayConfig display) {
         var text = itemManager.getItemComposition(item.getId()).getName();
+
         if (item.getQuantity() > 1) {
             text += " (" + item.getQuantity() + ")";
+        } else if (unstackedCount > 1) {
+            text += " x" + unstackedCount; // we want these to be visually different
         }
+
         if (display.isShowValue()) {
             var value = itemManager.getItemPrice(item.getId()) * item.getQuantity();
             text += " (" + getValueText(value) + ")";
         }
-        return text;
-    }
 
-    private String getValueText(int value) {
-        if (value >= 1e9) { // > 1b
-            return String.format("%.2fB", (float)value / 1e9);
-        } else if (value >= 1e8) { // > 100m
-            return String.format("%.0fM", (float)value / 1e6);
-        } else if (value >= 1e7) { // > 10m
-            return String.format("%.1fM", (float)value / 1e6);
-        } else if (value >= 1e6) { // > 1m
-            return String.format("%.2fM", (float)value / 1e6);
-        } else if (value >= 1e5) { // > 100k
-            return String.format("%.0fK", (float)value / 1e3);
-        } else if (value >= 1e4) { // > 10k
-            return String.format("%.1fK", (float)value / 1e3);
-        } else if (value >= 1e3) { // > 1k
-            return String.format("%.2fK", (float)value / 1e3);
-        }
-        return value + "gp";
+        return text;
     }
 }

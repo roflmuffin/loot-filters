@@ -34,4 +34,23 @@ public class TextUtil {
     public static Color parseArgb(String argb) {
         return new Color(Long.decode("0x" + argb).intValue(), true);
     }
+
+    public static String getValueText(int value) {
+        if (value >= 1e9) { // > 1b
+            return String.format("%.2fB", (float)value / 1e9);
+        } else if (value >= 1e8) { // > 100m
+            return String.format("%.0fM", (float)value / 1e6);
+        } else if (value >= 1e7) { // > 10m
+            return String.format("%.1fM", (float)value / 1e6);
+        } else if (value >= 1e6) { // > 1m
+            return String.format("%.2fM", (float)value / 1e6);
+        } else if (value >= 1e5) { // > 100k
+            return String.format("%.0fK", (float)value / 1e3);
+        } else if (value >= 1e4) { // > 10k
+            return String.format("%.1fK", (float)value / 1e3);
+        } else if (value >= 1e3) { // > 1k
+            return String.format("%.2fK", (float)value / 1e3);
+        }
+        return value + "gp";
+    }
 }
