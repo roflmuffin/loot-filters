@@ -1,5 +1,6 @@
 package com.lootfilters;
 
+import com.lootfilters.config.OwnershipFilterMode;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
@@ -9,17 +10,72 @@ import java.awt.Color;
 
 @ConfigGroup("loot-filters")
 public interface LootFiltersConfig extends Config {
+    @ConfigSection(
+            name = "General",
+            description = "Configure general options.",
+            position = 0
+    )
+    String general = "general";
     @ConfigItem(
             keyName = "filterConfig",
             name = "Filter config",
-            description = "The filter config syntax. Currently only supports JSON."
+            description = "The filter config.",
+            section = general,
+            position = 0
     )
     default String filterConfig() { return ""; }
+    @ConfigItem(
+            keyName = "showUnmatchedItems",
+            name = "Show unmatched items",
+            description = "By default, items that do not match a filter rule will not get a text overlay. Enable this to instead show the overlay as a fallback when an item doesn't match a filter rule.",
+            section = general,
+            position = 1
+    )
+    default boolean showUnmatchedItems() { return false; }
+    @ConfigItem(
+            keyName = "ownershipFilter",
+            name = "Ownership filter",
+            description = "Configure an item ownership filter. This filter is ABSOLUTE, and overrides ALL other rules, including default highlight/hide, default item value rules, and the active loot filter.",
+            section = general,
+            position = 2
+    )
+    default OwnershipFilterMode ownershipFilter() { return OwnershipFilterMode.ALL; }
+
+    @ConfigSection(
+            name = "Item lists",
+            description = "Configure default lists of highlighted and hidden items. Values are case-insensitive, separated by comma.",
+            position = 1
+    )
+    String itemLists = "itemLists";
+    @ConfigItem(
+            keyName = "highlightedItems",
+            name = "Highlighted items",
+            description = "Configure a list of items to highlight.",
+            section = itemLists,
+            position = 0
+    )
+    default String highlightedItems() { return ""; }
+    @ConfigItem(
+            keyName = "hiddenItems",
+            name = "Hidden items",
+            description = "Configure a list of items to hide.",
+            section = itemLists,
+            position = 1
+    )
+    default String hiddenItems() { return ""; }
+    @ConfigItem(
+            keyName = "highlightColor",
+            name = "Highlight color",
+            description = "Configures the color for highlighted items.",
+            section = itemLists,
+            position = 2
+    )
+    default Color highlightColor() { return Color.decode("#aa00ff"); }
 
     @ConfigSection(
             name = "Item value rules",
-            description = "Configure global, default rules for matching item value.",
-            position = 0
+            description = "Configure default rules for showing based on item value. These rules are checked AFTER both the active filter and the global hide list.",
+            position = 2
     )
     String itemValueRules = "itemValueRules";
     @ConfigItem(

@@ -2,6 +2,7 @@ package com.lootfilters;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.lootfilters.config.OwnershipFilterMode;
 import com.lootfilters.rule.Rule;
 import com.lootfilters.serde.ColorDeserializer;
 import com.lootfilters.serde.ColorSerializer;
@@ -11,6 +12,7 @@ import lombok.Getter;
 import net.runelite.api.TileItem;
 
 import java.awt.Color;
+import java.security.acl.Owner;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,5 +52,18 @@ public class FilterConfig {
 
     public boolean test(LootFiltersPlugin plugin, TileItem item) {
         return rule.test(plugin, item);
+    }
+
+    public static FilterConfig ownershipFilter(OwnershipFilterMode mode) {
+        var rule = new Rule("") {
+            @Override
+            public boolean test(LootFiltersPlugin plugin, TileItem item) {
+                return false;
+            }
+        };
+        var display = DisplayConfig.builder()
+                .hidden(true)
+                .build();
+        return new FilterConfig();
     }
 }
