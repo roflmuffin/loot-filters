@@ -3,66 +3,24 @@
 Work in progress.
 
 `loot-filters` is a general-purpose, highly configurable plugin that controls when and how ground item text overlays are
-displayed.
+displayed. It is essentially an extended implementation of the builtin ground items plugin with additional config.
 
-This plugin is effectively mutually exclusive with the builtin ground items plugin, which should be disabled when using
-this alternative.
+This plugin is mutually exclusive with the ground items builtin, which should be disabled when using this one.
+
+## configuration
+
+The base configuration is largely mirrored from that of the ground items builtin, supporting the following:
+* general "highlight" list
+* general "hide" list
+* configurable item value tiers (insane, high, medium, low)
 
 ## filter syntax
 
-todo
+The primary addition of this plugin is support for scriptable filters.
 
-### example: item value tiers
-
-The following filter syntax re-implements the item value display colors supported by the builtin ground items plugin:
-
-```json
-[
-  {
-    "rule": {
-      "discriminator": "item_value", "rhs": 10000000, "cmp": "GT_EQ"
-    },
-    "display": {
-      "color": "ffff8000", "showLootbeam": true
-    }
-  },
-  {
-    "rule": {
-      "discriminator": "item_value", "rhs": 1000000, "cmp": "GT_EQ"
-    },
-    "display": {
-      "color": "ffa335ee", "showLootbeam": true
-    }
-  },
-  {
-    "rule": {
-      "discriminator": "item_value", "rhs": 100000, "cmp": "GT_EQ"
-    },
-    "display": {
-      "color": "ff0070dd"
-    }
-  },
-  {
-    "rule": {
-      "discriminator": "item_value", "rhs": 10000, "cmp": "GT_EQ"
-    },
-    "display": {
-      "color": "ff1eff00"
-    }
-  },
-  {
-    "rule": {
-      "discriminator": "item_quantity", "rhs": 0, "cmp": "GT"
-    },
-    "display": {
-      "color": "ff1eff00"
-    }
-  }
-]
-```
+syntax description todo
 
 ## todo
-* feature: ground items parity: ownership filter
 * feature: display config: global overrides
-* feature?: ground items parity: global "hide" list
+* feature: script select panel
 * fix: reflow lootbeam display on filter config update
