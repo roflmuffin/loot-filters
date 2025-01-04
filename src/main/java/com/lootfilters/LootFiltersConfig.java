@@ -1,6 +1,5 @@
 package com.lootfilters;
 
-import com.lootfilters.config.OwnershipFilterMode;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
@@ -35,11 +34,11 @@ public interface LootFiltersConfig extends Config {
     @ConfigItem(
             keyName = "ownershipFilter",
             name = "Ownership filter",
-            description = "Configure an item ownership filter. This filter is ABSOLUTE, and overrides ALL other rules, including default highlight/hide, default item value rules, and the active loot filter.",
+            description = "When enabled, filters out any items you cannot pick up. This filter is ABSOLUTE, and overrides ALL other rules, including default highlight/hide, default item value rules, and the active loot filter.",
             section = general,
             position = 2
     )
-    default OwnershipFilterMode ownershipFilter() { return OwnershipFilterMode.ALL; }
+    default boolean ownershipFilter() { return false; }
 
     @ConfigSection(
             name = "Item lists",

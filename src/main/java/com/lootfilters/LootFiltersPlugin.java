@@ -51,11 +51,30 @@ public class LootFiltersPlugin extends Plugin
 
 	private List<FilterConfig> filterConfigs;
 
+	private void loadFilterConfig() throws Exception {
+		var userFilters = new Parser(new Lexer(config.filterConfig()).tokenize()).parse();
+
+		filterConfigs = new ArrayList<>();
+		filterConfigs.add(FilterConfig.ownershipFilter(config.ownershipFilter()));
+
+		filterConfigs.addAll(userFilters);
+
+		filterConfigs.add(FilterConfig.highlight(config.highlightedItems(), config.highlightColor()));
+		filterConfigs.add(FilterConfig.hide(config.hiddenItems()));
+
+		filterConfigs.add(FilterConfig.valueTier(config.enableInsaneItemValueTier(), config.insaneValue(), config.insaneValueColor(), true));
+		filterConfigs.add(FilterConfig.valueTier(config.enableHighItemValueTier(), config.highValue(), config.highValueColor(), true));
+		filterConfigs.add(FilterConfig.valueTier(config.enableMediumItemValueTier(), config.mediumValue(), config.mediumValueColor(), false));
+		filterConfigs.add(FilterConfig.valueTier(config.enableLowItemValueTier(), config.lowValue(), config.lowValueColor(), false));
+
+		filterConfigs.add(FilterConfig.showUnmatched(config.showUnmatchedItems()));
+	}
+
 	@Override
 	protected void startUp() throws Exception {
 		overlayManager.add(overlay);
 
-		filterConfigs = new Parser(new Lexer(config.filterConfig()).tokenize()).parse();
+		loadFilterConfig();
 	}
 
 	@Override
@@ -74,7 +93,7 @@ public class LootFiltersPlugin extends Plugin
 	@Subscribe
 	public void onConfigChanged(ConfigChanged event) throws Exception {
 		if (event.getGroup().equals("loot-filters")) {
-			filterConfigs = new Parser(new Lexer(config.filterConfig()).tokenize()).parse();
+			loadFilterConfig();
 		}
 	}
 
