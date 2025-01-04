@@ -8,7 +8,7 @@ import lombok.Getter;
 import java.awt.Color;
 
 @Getter
-@Builder
+@Builder(toBuilder = true)
 @AllArgsConstructor
 @EqualsAndHashCode
 public class DisplayConfig {

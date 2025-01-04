@@ -21,6 +21,5 @@ The primary addition of this plugin is support for scriptable filters.
 syntax description todo
 
 ## todo
-* feature: display config: global overrides
 * feature: script select panel
 * fix: reflow lootbeam display on filter config update

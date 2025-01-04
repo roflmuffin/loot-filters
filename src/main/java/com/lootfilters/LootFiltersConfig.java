@@ -41,9 +41,32 @@ public interface LootFiltersConfig extends Config {
     default boolean ownershipFilter() { return false; }
 
     @ConfigSection(
+            name = "Display overrides",
+            description = "Configure global display overrides.",
+            position = 1
+    )
+    String displayOverrides = "displayOverrides";
+    @ConfigItem(
+            keyName = "alwaysShowValue",
+            name = "Always show value",
+            description = "Always show item value.",
+            section = displayOverrides,
+            position = 0
+    )
+    default boolean alwaysShowValue() { return false; }
+    @ConfigItem(
+            keyName = "alwaysShowDespawn",
+            name = "Always show despawn",
+            description = "Always show item despawn timers.",
+            section = displayOverrides,
+            position = 1
+    )
+    default boolean alwaysShowDespawn() { return false; }
+
+    @ConfigSection(
             name = "Item lists",
             description = "Configure default lists of highlighted and hidden items. Values are case-insensitive, separated by comma.",
-            position = 1
+            position = 2
     )
     String itemLists = "itemLists";
     @ConfigItem(

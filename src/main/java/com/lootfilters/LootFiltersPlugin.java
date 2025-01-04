@@ -68,6 +68,21 @@ public class LootFiltersPlugin extends Plugin
 		filterConfigs.add(FilterConfig.valueTier(config.enableLowItemValueTier(), config.lowValue(), config.lowValueColor(), false));
 
 		filterConfigs.add(FilterConfig.showUnmatched(config.showUnmatchedItems()));
+
+		if (config.alwaysShowValue()) {
+			filterConfigs = filterConfigs.stream()
+					.map(it -> new FilterConfig(it.getRule(), it.getDisplay().toBuilder()
+							.showValue(true)
+							.build()))
+					.collect(Collectors.toList());
+		}
+		if (config.alwaysShowDespawn()) {
+			filterConfigs = filterConfigs.stream()
+					.map(it -> new FilterConfig(it.getRule(), it.getDisplay().toBuilder()
+							.showDespawn(true)
+							.build()))
+					.collect(Collectors.toList());
+		}
 	}
 
 	@Override
