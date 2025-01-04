@@ -2,6 +2,8 @@ package com.lootfilters;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.lootfilters.rule.Comparator;
+import com.lootfilters.rule.ItemValueRule;
 import com.lootfilters.rule.Rule;
 import com.lootfilters.serde.ColorDeserializer;
 import com.lootfilters.serde.ColorSerializer;
@@ -56,8 +58,7 @@ public class FilterConfig {
 
     public static FilterConfig ownershipFilter(boolean enabled) {
         var rule = new Rule("") {
-            @Override
-            public boolean test(LootFiltersPlugin plugin, TileItem item) {
+            @Override public boolean test(LootFiltersPlugin plugin, TileItem item) {
                 var accountType = plugin.getClient().getVarbitValue(Varbits.ACCOUNT_TYPE);
                 return enabled && accountType != 0 && item.getOwnership() == TileItem.OWNERSHIP_OTHER;
             }
@@ -70,8 +71,7 @@ public class FilterConfig {
 
     public static FilterConfig showUnmatched(boolean enabled) {
         var rule = new Rule("") {
-            @Override
-            public boolean test(LootFiltersPlugin plugin, TileItem item) {
+            @Override public boolean test(LootFiltersPlugin plugin, TileItem item) {
                 return enabled;
             }
         };
@@ -82,11 +82,10 @@ public class FilterConfig {
     }
 
     public static FilterConfig valueTier(boolean enabled, int value, Color color, boolean showLootbeam) {
+        var inner = new ItemValueRule(value, Comparator.GT_EQ);
         var rule = new Rule("") {
-            @Override
-            public boolean test(LootFiltersPlugin plugin, TileItem item) {
-                var price = plugin.getItemManager().getItemPrice(item.getId());
-                return enabled && price >= value;
+            @Override public boolean test(LootFiltersPlugin plugin, TileItem item) {
+                return enabled && inner.test(plugin, item);
             }
         };
         var display = DisplayConfig.builder()
@@ -100,8 +99,7 @@ public class FilterConfig {
     public static FilterConfig highlight(String rawNames, Color color) {
         var names = rawNames.split(",");
         var rule = new Rule("") {
-            @Override
-            public boolean test(LootFiltersPlugin plugin, TileItem item) {
+            @Override public boolean test(LootFiltersPlugin plugin, TileItem item) {
                 var name = plugin.getItemManager().getItemComposition(item.getId()).getName();
                 return Arrays.stream(names).anyMatch(it -> it.equalsIgnoreCase(name));
             }
@@ -115,8 +113,7 @@ public class FilterConfig {
     public static FilterConfig hide(String rawNames) {
         var names = rawNames.split(",");
         var rule = new Rule("") {
-            @Override
-            public boolean test(LootFiltersPlugin plugin, TileItem item) {
+            @Override public boolean test(LootFiltersPlugin plugin, TileItem item) {
                 var name = plugin.getItemManager().getItemComposition(item.getId()).getName();
                 return Arrays.stream(names).anyMatch(it -> it.equalsIgnoreCase(name));
             }
