@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.lootfilters.FilterConfig.findMatch;
+import static com.lootfilters.MatcherConfig.findMatch;
 import static net.runelite.client.util.ColorUtil.colorTag;
 import static net.runelite.client.util.ImageUtil.loadImageResource;
 
@@ -56,36 +56,36 @@ public class LootFiltersPlugin extends Plugin
 	private final TileItemIndex tileItemIndex = new TileItemIndex();
 	private final LootbeamIndex lootbeamIndex = new LootbeamIndex();
 
-	private List<FilterConfig> filterConfigs;
+	private List<MatcherConfig> matcherConfigs;
 
 	private void loadFilterConfig() throws Exception {
 		var userFilters = new Parser(new Lexer(config.filterConfig()).tokenize()).parse();
 
-		filterConfigs = new ArrayList<>();
-		filterConfigs.add(FilterConfig.ownershipFilter(config.ownershipFilter()));
+		matcherConfigs = new ArrayList<>();
+		matcherConfigs.add(MatcherConfig.ownershipFilter(config.ownershipFilter()));
 
-		filterConfigs.addAll(userFilters);
+		matcherConfigs.addAll(userFilters);
 
-		filterConfigs.add(FilterConfig.highlight(config.highlightedItems(), config.highlightColor()));
-		filterConfigs.add(FilterConfig.hide(config.hiddenItems()));
+		matcherConfigs.add(MatcherConfig.highlight(config.highlightedItems(), config.highlightColor()));
+		matcherConfigs.add(MatcherConfig.hide(config.hiddenItems()));
 
-		filterConfigs.add(FilterConfig.valueTier(config.enableInsaneItemValueTier(), config.insaneValue(), config.insaneValueColor(), true));
-		filterConfigs.add(FilterConfig.valueTier(config.enableHighItemValueTier(), config.highValue(), config.highValueColor(), true));
-		filterConfigs.add(FilterConfig.valueTier(config.enableMediumItemValueTier(), config.mediumValue(), config.mediumValueColor(), false));
-		filterConfigs.add(FilterConfig.valueTier(config.enableLowItemValueTier(), config.lowValue(), config.lowValueColor(), false));
+		matcherConfigs.add(MatcherConfig.valueTier(config.enableInsaneItemValueTier(), config.insaneValue(), config.insaneValueColor(), true));
+		matcherConfigs.add(MatcherConfig.valueTier(config.enableHighItemValueTier(), config.highValue(), config.highValueColor(), true));
+		matcherConfigs.add(MatcherConfig.valueTier(config.enableMediumItemValueTier(), config.mediumValue(), config.mediumValueColor(), false));
+		matcherConfigs.add(MatcherConfig.valueTier(config.enableLowItemValueTier(), config.lowValue(), config.lowValueColor(), false));
 
-		filterConfigs.add(FilterConfig.showUnmatched(config.showUnmatchedItems()));
+		matcherConfigs.add(MatcherConfig.showUnmatched(config.showUnmatchedItems()));
 
 		if (config.alwaysShowValue()) {
-			filterConfigs = filterConfigs.stream()
-					.map(it -> new FilterConfig(it.getRule(), it.getDisplay().toBuilder()
+			matcherConfigs = matcherConfigs.stream()
+					.map(it -> new MatcherConfig(it.getRule(), it.getDisplay().toBuilder()
 							.showValue(true)
 							.build()))
 					.collect(Collectors.toList());
 		}
 		if (config.alwaysShowDespawn()) {
-			filterConfigs = filterConfigs.stream()
-					.map(it -> new FilterConfig(it.getRule(), it.getDisplay().toBuilder()
+			matcherConfigs = matcherConfigs.stream()
+					.map(it -> new MatcherConfig(it.getRule(), it.getDisplay().toBuilder()
 							.showDespawn(true)
 							.build()))
 					.collect(Collectors.toList());
@@ -136,7 +136,7 @@ public class LootFiltersPlugin extends Plugin
 		tileItemIndex.put(tile, item);
 
 		// lootbeams
-		var match = filterConfigs.stream()
+		var match = matcherConfigs.stream()
 				.filter(it -> it.test(this, item))
 				.findFirst().orElse(null);
 		if (match == null || !match.getDisplay().isShowLootbeam()) {
@@ -184,7 +184,7 @@ public class LootFiltersPlugin extends Plugin
 
 			var point = WorldPoint.fromScene(wv, entry.getParam0(), entry.getParam1(), wv.getPlane());
 			var item = tileItemIndex.findItem(point, entry.getIdentifier());
-			var match = findMatch(filterConfigs, this, item);
+			var match = findMatch(matcherConfigs, this, item);
 			if (match != null && !match.isHidden()) {
 				if (itemCounts.get(entry) > 1) {
 					entry.setTarget(colorTag(match.getTextColor()) + itemManager.getItemComposition(item.getId()).getName() + " x" + itemCounts.get(entry));

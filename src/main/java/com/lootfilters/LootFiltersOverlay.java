@@ -40,7 +40,7 @@ public class LootFiltersOverlay extends Overlay {
 
     @Override
     public Dimension render(Graphics2D g) {
-        var filters = plugin.getFilterConfigs();
+        var filters = plugin.getMatcherConfigs();
         for (var entry : plugin.getTileItemIndex().entrySet()) {
             var items = entry.getValue();
             var itemCounts = items.stream()

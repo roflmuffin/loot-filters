@@ -1,45 +1,24 @@
 package com.lootfilters;
 
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import com.lootfilters.rule.Comparator;
 import com.lootfilters.rule.ItemValueRule;
 import com.lootfilters.rule.Rule;
-import com.lootfilters.serde.ColorDeserializer;
-import com.lootfilters.serde.ColorSerializer;
-import com.lootfilters.serde.RuleDeserializer;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import net.runelite.api.TileItem;
 import net.runelite.api.Varbits;
 
 import java.awt.Color;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 @Getter
 @EqualsAndHashCode
-public class FilterConfig {
+public class MatcherConfig {
     private final Rule rule;
     private final DisplayConfig display;
 
-    public static String toJson(List<FilterConfig> filters) {
-        var gson = new GsonBuilder()
-                .registerTypeAdapter(Color.class, new ColorSerializer())
-                .create();
-        return gson.toJson(filters);
-    }
-
-    public static List<FilterConfig> fromJson(String json) {
-        var gson = new GsonBuilder()
-                .registerTypeAdapter(Color.class, new ColorDeserializer())
-                .registerTypeAdapter(Rule.class, new RuleDeserializer())
-                .create();
-        return gson.fromJson(json, new TypeToken<ArrayList<FilterConfig>>() {}.getType());
-    }
-
-    public static DisplayConfig findMatch(List<FilterConfig> filters, LootFiltersPlugin plugin, TileItem item) {
+    public static DisplayConfig findMatch(List<MatcherConfig> filters, LootFiltersPlugin plugin, TileItem item) {
         var match = filters.stream()
                 .filter(it -> it.rule.test(plugin, item))
                 .findFirst()
@@ -47,7 +26,7 @@ public class FilterConfig {
         return match != null ? match.display : null;
     }
 
-    public FilterConfig(Rule rule, DisplayConfig display) {
+    public MatcherConfig(Rule rule, DisplayConfig display) {
         this.rule = rule;
         this.display = display;
     }
@@ -56,7 +35,7 @@ public class FilterConfig {
         return rule.test(plugin, item);
     }
 
-    public static FilterConfig ownershipFilter(boolean enabled) {
+    public static MatcherConfig ownershipFilter(boolean enabled) {
         var rule = new Rule("") {
             @Override public boolean test(LootFiltersPlugin plugin, TileItem item) {
                 var accountType = plugin.getClient().getVarbitValue(Varbits.ACCOUNT_TYPE);
@@ -66,10 +45,10 @@ public class FilterConfig {
         var display = DisplayConfig.builder()
                 .hidden(true)
                 .build();
-        return new FilterConfig(rule, display);
+        return new MatcherConfig(rule, display);
     }
 
-    public static FilterConfig showUnmatched(boolean enabled) {
+    public static MatcherConfig showUnmatched(boolean enabled) {
         var rule = new Rule("") {
             @Override public boolean test(LootFiltersPlugin plugin, TileItem item) {
                 return enabled;
@@ -78,10 +57,10 @@ public class FilterConfig {
         var display = DisplayConfig.builder()
                 .textColor(Color.WHITE)
                 .build();
-        return new FilterConfig(rule, display);
+        return new MatcherConfig(rule, display);
     }
 
-    public static FilterConfig valueTier(boolean enabled, int value, Color color, boolean showLootbeam) {
+    public static MatcherConfig valueTier(boolean enabled, int value, Color color, boolean showLootbeam) {
         var inner = new ItemValueRule(value, Comparator.GT_EQ);
         var rule = new Rule("") {
             @Override public boolean test(LootFiltersPlugin plugin, TileItem item) {
@@ -93,10 +72,10 @@ public class FilterConfig {
                 .showLootbeam(showLootbeam)
                 .showValue(true)
                 .build();
-        return new FilterConfig(rule, display);
+        return new MatcherConfig(rule, display);
     }
 
-    public static FilterConfig highlight(String rawNames, Color color) {
+    public static MatcherConfig highlight(String rawNames, Color color) {
         var names = rawNames.split(",");
         var rule = new Rule("") {
             @Override public boolean test(LootFiltersPlugin plugin, TileItem item) {
@@ -107,10 +86,10 @@ public class FilterConfig {
         var display = DisplayConfig.builder()
                 .textColor(color)
                 .build();
-        return new FilterConfig(rule, display);
+        return new MatcherConfig(rule, display);
     }
 
-    public static FilterConfig hide(String rawNames) {
+    public static MatcherConfig hide(String rawNames) {
         var names = rawNames.split(",");
         var rule = new Rule("") {
             @Override public boolean test(LootFiltersPlugin plugin, TileItem item) {
@@ -121,6 +100,6 @@ public class FilterConfig {
         var display = DisplayConfig.builder()
                 .hidden(true)
                 .build();
-        return new FilterConfig(rule, display);
+        return new MatcherConfig(rule, display);
     }
 }

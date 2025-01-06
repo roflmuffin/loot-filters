@@ -1,7 +1,7 @@
 package com.lootfilters.lang;
 
 import com.lootfilters.DisplayConfig;
-import com.lootfilters.FilterConfig;
+import com.lootfilters.MatcherConfig;
 import com.lootfilters.rule.AndRule;
 import com.lootfilters.rule.Comparator;
 import com.lootfilters.rule.ItemIdRule;
@@ -34,13 +34,13 @@ import static com.lootfilters.util.TextUtil.parseArgb;
 // restricted enough that it should be fine for now.
 public class Parser {
     private final TokenStream tokens;
-    private final List<FilterConfig> filters = new ArrayList<>();
+    private final List<MatcherConfig> filters = new ArrayList<>();
 
     public Parser(List<Token> tokens) {
         this.tokens = new TokenStream(tokens);
     }
 
-    public List<FilterConfig> parse() throws Exception {
+    public List<MatcherConfig> parse() throws Exception {
         while (tokens.isNotEmpty()) {
             var first = tokens.take();
             if (first.is(IF)) {
@@ -125,7 +125,7 @@ public class Parser {
         }
         tokens.takeExpect(BLOCK_END);
 
-        filters.add(new FilterConfig(buildRule(rulesPostfix), builder.build()));
+        filters.add(new MatcherConfig(buildRule(rulesPostfix), builder.build()));
     }
 
     private Rule parseRule(Token first) {
