@@ -19,6 +19,8 @@ import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.ui.ClientToolbar;
+import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
@@ -30,6 +32,7 @@ import java.util.stream.Stream;
 
 import static com.lootfilters.FilterConfig.findMatch;
 import static net.runelite.client.util.ColorUtil.colorTag;
+import static net.runelite.client.util.ImageUtil.loadImageResource;
 
 @Slf4j
 @PluginDescriptor(
@@ -39,12 +42,16 @@ import static net.runelite.client.util.ColorUtil.colorTag;
 public class LootFiltersPlugin extends Plugin
 {
 	@Inject private Client client;
+	@Inject private ClientToolbar clientToolbar;
 	@Inject private ClientThread clientThread;
 	@Inject private LootFiltersConfig config;
 	@Inject private LootFiltersOverlay overlay;
 	@Inject private OverlayManager overlayManager;
 	@Inject private ConfigManager configManager;
 	@Inject private ItemManager itemManager;
+
+	private LootFiltersPanel pluginPanel;
+	private NavigationButton pluginPanelNav;
 
 	private final TileItemIndex tileItemIndex = new TileItemIndex();
 	private final LootbeamIndex lootbeamIndex = new LootbeamIndex();
@@ -90,6 +97,14 @@ public class LootFiltersPlugin extends Plugin
 		overlayManager.add(overlay);
 
 		loadFilterConfig();
+
+		pluginPanel = new LootFiltersPanel(this);
+		pluginPanelNav = NavigationButton.builder()
+				.tooltip("Loot filters")
+				.icon(loadImageResource(this.getClass(), "/com/lootfilters/icons/Placeholder.png"))
+				.panel(pluginPanel)
+				.build();
+		clientToolbar.addNavigation(pluginPanelNav);
 	}
 
 	@Override
@@ -98,6 +113,8 @@ public class LootFiltersPlugin extends Plugin
 
 		tileItemIndex.clear();
 		lootbeamIndex.clear();
+
+		clientToolbar.removeNavigation(pluginPanelNav);
 	}
 
 	@Provides

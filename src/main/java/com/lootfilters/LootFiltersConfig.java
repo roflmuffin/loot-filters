@@ -6,6 +6,7 @@ import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
 
 import java.awt.Color;
+import java.io.IOException;
 
 @ConfigGroup("loot-filters")
 public interface LootFiltersConfig extends Config {
@@ -22,7 +23,11 @@ public interface LootFiltersConfig extends Config {
             section = general,
             position = 0
     )
-    default String filterConfig() { return ""; }
+    default String filterConfig() throws IOException {
+        try (var filter = getClass().getResourceAsStream("/com/lootfilters/scripts/riktenx.rs2f")) {
+            return new String(filter.readAllBytes());
+        }
+    }
     @ConfigItem(
             keyName = "showUnmatchedItems",
             name = "Show unmatched items",
