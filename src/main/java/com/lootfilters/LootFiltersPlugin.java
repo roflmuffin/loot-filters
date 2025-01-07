@@ -8,6 +8,7 @@ import net.runelite.api.MenuAction;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ClientTick;
+import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemDespawned;
 import net.runelite.api.events.ItemSpawned;
 import net.runelite.client.callback.ClientThread;
@@ -87,7 +88,7 @@ public class LootFiltersPlugin extends Plugin
 					.collect(Collectors.toCollection(ArrayList::new));
 		}
 
-		activeFilter = new LootFilter(userFilter.getName(), userFilter.getDescription(), matchersWithConfig);
+		activeFilter = new LootFilter(userFilter.getName(), userFilter.getDescription(), userFilter.getActivationArea(), matchersWithConfig);
 	}
 
 	@Override
@@ -149,6 +150,11 @@ public class LootFiltersPlugin extends Plugin
 		var item = event.getItem();
 		tileItemIndex.remove(tile, item);
 		lootbeamIndex.remove(tile, item); // idempotent, we don't care if there wasn't a beam
+	}
+
+	@Subscribe
+	public void onGameTick(GameTick event) {
+		//
 	}
 
 	@Subscribe

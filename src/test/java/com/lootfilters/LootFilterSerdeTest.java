@@ -17,6 +17,7 @@ public class LootFilterSerdeTest {
         var filter = new LootFilter(
                 "foo",
                 "bar",
+                null,
                 List.of(
                         new MatcherConfig(new ItemIdRule(1), new DisplayConfig(Color.RED)),
                         new MatcherConfig(new ItemNameRule("bandos-crossbow"), new DisplayConfig(Color.GREEN)),

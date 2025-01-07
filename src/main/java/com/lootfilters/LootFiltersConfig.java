@@ -17,6 +17,16 @@ public interface LootFiltersConfig extends Config {
     )
     String general = "general";
     @ConfigItem(
+            keyName = "autoToggleFilter",
+            name = "Auto-toggle active filter",
+            description = "Filters can be annotated with area boundaries in which they are relevant. If enabled, filters will automatically become active when the player enters their corresponding area.",
+            section = general,
+            position = -1
+    )
+    default boolean autoToggleFilters() {
+        return true;
+    }
+    @ConfigItem(
             keyName = "filterConfig",
             name = "Filter config",
             description = "The filter config.",

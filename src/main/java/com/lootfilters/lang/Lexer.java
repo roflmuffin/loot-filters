@@ -13,24 +13,27 @@ import static com.lootfilters.util.TextUtil.isWhitespace;
 @RequiredArgsConstructor
 public class Lexer {
     private static final LinkedHashMap<String, Token.Type> STATICS = new LinkedHashMap<>() {{
-        put("(", Token.Type.EXPR_START);
-        put(")", Token.Type.EXPR_END);
+        put("false", Token.Type.FALSE);
+        put("true", Token.Type.TRUE);
+        put("meta", Token.Type.META);
+        put("if", Token.Type.IF);
+        put("&&", Token.Type.OP_AND);
+        put("||", Token.Type.OP_OR);
+        put(">=", Token.Type.OP_GTEQ);
+        put("<=", Token.Type.OP_LTEQ);
         put("==", Token.Type.OP_EQ);
         put(">", Token.Type.OP_GT);
         put("<", Token.Type.OP_LT);
-        put(">=", Token.Type.OP_GTEQ);
-        put("<=", Token.Type.OP_LTEQ);
-        put("&&", Token.Type.OP_AND);
-        put("||", Token.Type.OP_OR);
         put(";", Token.Type.STMT_END);
-        put("true", Token.Type.TRUE);
-        put("false", Token.Type.FALSE);
-        put("if", Token.Type.IF);
         put(":", Token.Type.COLON);
+        put("=", Token.Type.ASSIGN);
+        put(",", Token.Type.COMMA);
+        put("(", Token.Type.EXPR_START);
+        put(")", Token.Type.EXPR_END);
         put("{", Token.Type.BLOCK_START);
         put("}", Token.Type.BLOCK_END);
-        put("=", Token.Type.ASSIGN);
-        put("meta", Token.Type.META);
+        put("[", Token.Type.LIST_START);
+        put("]", Token.Type.LIST_END);
     }};
 
     private final String input;

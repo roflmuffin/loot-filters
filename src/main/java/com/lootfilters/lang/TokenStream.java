@@ -28,6 +28,12 @@ public class TokenStream {
         return null;
     }
 
+    public void takeOptional(Token.Type type) {
+        if (peek().is(type)) {
+            take();
+        }
+    }
+
     public Token takeExpect(Token.Type expect) {
         if (tokens.isEmpty()) {
             throw new ParseException("unexpected end of token stream");

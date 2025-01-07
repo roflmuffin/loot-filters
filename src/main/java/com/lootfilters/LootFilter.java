@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import net.runelite.api.TileItem;
+import net.runelite.api.coords.WorldPoint;
 
 import java.awt.Color;
 import java.util.List;
@@ -21,6 +22,7 @@ import java.util.List;
 public class LootFilter {
     private final String name;
     private final String description;
+    private final int[] activationArea;
     private final List<MatcherConfig> matchers;
 
     public static LootFilter fromJson(String json) {
@@ -49,5 +51,13 @@ public class LootFilter {
                 .findFirst()
                 .orElse(null);
         return match != null ? match.getDisplay() : null;
+    }
+
+    public boolean isInActivationArea(WorldPoint p) {
+        if (activationArea == null) {
+            return false;
+        }
+        return p.getX() >= activationArea[0] && p.getY() >= activationArea[1] && p.getPlane() >= activationArea[2]
+                && p.getX() <= activationArea[3] && p.getY() <= activationArea[4] && p.getPlane() <= activationArea[5];
     }
 }

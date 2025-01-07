@@ -11,6 +11,7 @@ public class Token {
         IF,
         META,
         COLON,
+        COMMA,
         TRUE, FALSE,
         IDENTIFIER,
         LITERAL_INT, LITERAL_STRING,
@@ -18,6 +19,7 @@ public class Token {
         OP_EQ, OP_GT, OP_LT, OP_GTEQ, OP_LTEQ, OP_AND, OP_OR,
         EXPR_START, EXPR_END,
         BLOCK_START, BLOCK_END,
+        LIST_START, LIST_END,
         STMT_END,
     }
 

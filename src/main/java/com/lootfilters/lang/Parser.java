@@ -11,6 +11,8 @@ import com.lootfilters.rule.ItemQuantityRule;
 import com.lootfilters.rule.ItemValueRule;
 import com.lootfilters.rule.OrRule;
 import com.lootfilters.rule.Rule;
+import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldPoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,10 +22,13 @@ import static com.lootfilters.lang.Token.Type.ASSIGN;
 import static com.lootfilters.lang.Token.Type.BLOCK_END;
 import static com.lootfilters.lang.Token.Type.BLOCK_START;
 import static com.lootfilters.lang.Token.Type.COLON;
+import static com.lootfilters.lang.Token.Type.COMMA;
 import static com.lootfilters.lang.Token.Type.EXPR_END;
 import static com.lootfilters.lang.Token.Type.EXPR_START;
 import static com.lootfilters.lang.Token.Type.IDENTIFIER;
 import static com.lootfilters.lang.Token.Type.IF;
+import static com.lootfilters.lang.Token.Type.LIST_END;
+import static com.lootfilters.lang.Token.Type.LIST_START;
 import static com.lootfilters.lang.Token.Type.LITERAL_INT;
 import static com.lootfilters.lang.Token.Type.LITERAL_STRING;
 import static com.lootfilters.lang.Token.Type.META;
@@ -40,6 +45,7 @@ public class Parser {
 
     private String name = "<no name>";
     private String description = "<no description>";
+    private int[] activationArea = null;
 
     public Parser(List<Token> tokens) {
         this.tokens = new TokenStream(tokens);
@@ -56,22 +62,34 @@ public class Parser {
                 throw new ParseException("unexpected token", tok);
             }
         }
-        return new LootFilter(name, description, matchers);
+        return new LootFilter(name, description, activationArea, matchers);
     }
 
     private void parseMeta() {
         var block = tokens.takeBlock();
         var tok = block.takeExpect(IDENTIFIER);
+        block.takeExpect(ASSIGN);
         switch (tok.getValue()) {
             case "name":
-                block.takeExpect(ASSIGN);
                 name = block.takeExpectLiteral().expectString();
                 block.takeExpect(STMT_END);
                 break;
             case "description":
-                block.takeExpect(ASSIGN);
                 description = block.takeExpectLiteral().expectString();
                 block.takeExpect(STMT_END);
+                break;
+            case "area":
+                block.takeExpect(LIST_START);
+                int x0 = block.takeExpectLiteral().expectInt(); block.takeExpect(COMMA);
+                int y0 = block.takeExpectLiteral().expectInt(); block.takeExpect(COMMA);
+                int z0 = block.takeExpectLiteral().expectInt(); block.takeExpect(COMMA);
+                int x1 = block.takeExpectLiteral().expectInt(); block.takeExpect(COMMA);
+                int y1 = block.takeExpectLiteral().expectInt(); block.takeExpect(COMMA);
+                int z1 = block.takeExpectLiteral().expectInt(); block.takeOptional(COMMA);
+                block.takeExpect(LIST_END);
+                block.takeExpect(STMT_END);
+
+                activationArea = new int[]{x0,y0,z0,x1,y1,z1};
                 break;
             default:
                 throw new ParseException("unrecognized metavalue", tok);
