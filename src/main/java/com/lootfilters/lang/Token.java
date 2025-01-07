@@ -9,6 +9,7 @@ public class Token {
     public enum Type {
         WHITESPACE,
         IF,
+        META,
         COLON,
         TRUE, FALSE,
         IDENTIFIER,

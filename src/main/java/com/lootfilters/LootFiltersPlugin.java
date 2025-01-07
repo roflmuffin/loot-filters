@@ -87,7 +87,7 @@ public class LootFiltersPlugin extends Plugin
 					.collect(Collectors.toCollection(ArrayList::new));
 		}
 
-		activeFilter = new LootFilter(userFilter.getName(), matchersWithConfig);
+		activeFilter = new LootFilter(userFilter.getName(), userFilter.getDescription(), matchersWithConfig);
 	}
 
 	@Override

@@ -20,6 +20,7 @@ import java.util.List;
 @EqualsAndHashCode
 public class LootFilter {
     private final String name;
+    private final String description;
     private final List<MatcherConfig> matchers;
 
     public static LootFilter fromJson(String json) {

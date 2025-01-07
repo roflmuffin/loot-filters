@@ -1,0 +1,19 @@
+meta {
+    name = "loot tiers";
+    description = "loot tiers like the ground items builtin";
+}
+
+if (value:>10000000) {
+    color="ffff8000";
+    showLootbeam=true;
+}
+if (value:>1000000) {
+    color="ffa335ee";
+    showLootbeam=true;
+}
+if (value:>100000) {
+    color="ff0070dd";
+}
+if (value:>10000) {
+    color="ff1eff00";
+}

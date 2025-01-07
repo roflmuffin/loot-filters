@@ -16,7 +16,7 @@ public class TextUtil {
     }
 
     public static boolean isWhitespace(char c) {
-        return c == ' ' || c == '\t' || c == '\n';
+        return c == ' ' || c == '\t' || c == '\n' || c == '\r';
     }
 
     public static boolean isNumeric(char c) {

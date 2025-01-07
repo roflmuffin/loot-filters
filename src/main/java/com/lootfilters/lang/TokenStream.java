@@ -2,6 +2,7 @@ package com.lootfilters.lang;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 import java.util.function.Consumer;
@@ -48,6 +49,44 @@ public class TokenStream {
             throw new ParseException("unexpected non-literal token", first);
         }
         return first;
+    }
+
+    public TokenStream takeBlock() {
+        var tokens = new ArrayList<Token>();
+        var state = new Stack<Token>();
+        if (!peek().is(Token.Type.BLOCK_START)) {
+            throw new ParseException("unexpected token", peek());
+        }
+
+        while (isNotEmpty()) {
+            var next = take();
+            if (next.is(Token.Type.BLOCK_START)) {
+                state.push(next);
+                if (!tokens.isEmpty()) { // inner block start, preserve it
+                    tokens.add(next);
+                }
+            } else if (next.is(Token.Type.BLOCK_END)) {
+                if (!state.isEmpty()) {
+                    state.pop();
+                    if (!state.isEmpty()) { // STILL not empty = inner block end, preserve it
+                        tokens.add(next);
+                    }
+                } else {
+                    throw new ParseException("unbalanced block: more { than }");
+                }
+            } else {
+                tokens.add(next);
+            }
+
+            if (state.isEmpty()) { // end of original block
+                return new TokenStream(tokens);
+            }
+        }
+        if (!state.isEmpty()) {
+            throw new ParseException("unbalanced block: more { than }");
+        }
+
+        return new TokenStream(tokens);
     }
 
     // Traverse an expression within the stream.

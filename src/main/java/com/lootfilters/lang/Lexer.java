@@ -30,6 +30,7 @@ public class Lexer {
         put("{", Token.Type.BLOCK_START);
         put("}", Token.Type.BLOCK_END);
         put("=", Token.Type.ASSIGN);
+        put("meta", Token.Type.META);
     }};
 
     private final String input;

@@ -16,6 +16,7 @@ public class LootFilterSerdeTest {
     public static void main(String[] args) throws Exception {
         var filter = new LootFilter(
                 "foo",
+                "bar",
                 List.of(
                         new MatcherConfig(new ItemIdRule(1), new DisplayConfig(Color.RED)),
                         new MatcherConfig(new ItemNameRule("bandos-crossbow"), new DisplayConfig(Color.GREEN)),

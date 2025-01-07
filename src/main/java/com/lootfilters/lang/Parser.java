@@ -26,6 +26,7 @@ import static com.lootfilters.lang.Token.Type.IDENTIFIER;
 import static com.lootfilters.lang.Token.Type.IF;
 import static com.lootfilters.lang.Token.Type.LITERAL_INT;
 import static com.lootfilters.lang.Token.Type.LITERAL_STRING;
+import static com.lootfilters.lang.Token.Type.META;
 import static com.lootfilters.lang.Token.Type.OP_AND;
 import static com.lootfilters.lang.Token.Type.OP_OR;
 import static com.lootfilters.lang.Token.Type.STMT_END;
@@ -35,25 +36,49 @@ import static com.lootfilters.util.TextUtil.parseArgb;
 // restricted enough that it should be fine for now.
 public class Parser {
     private final TokenStream tokens;
-    private final List<MatcherConfig> filters = new ArrayList<>();
+    private final List<MatcherConfig> matchers = new ArrayList<>();
+
+    private String name = "<no name>";
+    private String description = "<no description>";
 
     public Parser(List<Token> tokens) {
         this.tokens = new TokenStream(tokens);
     }
 
-    public LootFilter parse() throws Exception {
+    public LootFilter parse() throws ParseException {
         while (tokens.isNotEmpty()) {
-            var first = tokens.take();
-            if (first.is(IF)) {
-                parseFilterConfig();
+            var tok = tokens.take();
+            if (tok.is(META)) {
+                parseMeta();
+            } else if (tok.is(IF)) {
+                parseMatcher();
             } else {
-                throw new Exception("unexpected token " + first.getType());
+                throw new ParseException("unexpected token", tok);
             }
         }
-        return new LootFilter("", filters);
+        return new LootFilter(name, description, matchers);
     }
 
-    private void parseFilterConfig() {
+    private void parseMeta() {
+        var block = tokens.takeBlock();
+        var tok = block.takeExpect(IDENTIFIER);
+        switch (tok.getValue()) {
+            case "name":
+                block.takeExpect(ASSIGN);
+                name = block.takeExpectLiteral().expectString();
+                block.takeExpect(STMT_END);
+                break;
+            case "description":
+                block.takeExpect(ASSIGN);
+                description = block.takeExpectLiteral().expectString();
+                block.takeExpect(STMT_END);
+                break;
+            default:
+                throw new ParseException("unrecognized metavalue", tok);
+        }
+    }
+
+    private void parseMatcher() {
         var operators = new Stack<Token>();
         var rulesPostfix = new ArrayList<Rule>();
         tokens.walkExpression(it -> {
@@ -126,7 +151,7 @@ public class Parser {
         }
         tokens.takeExpect(BLOCK_END);
 
-        filters.add(new MatcherConfig(buildRule(rulesPostfix), builder.build()));
+        matchers.add(new MatcherConfig(buildRule(rulesPostfix), builder.build()));
     }
 
     private Rule parseRule(Token first) {

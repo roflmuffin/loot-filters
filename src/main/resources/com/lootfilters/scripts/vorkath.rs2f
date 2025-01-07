@@ -1,3 +1,19 @@
+#define HIDE(_name) {
+    if (name:_name) { hidden = true; }
+}
+
+meta {
+    name = "strict vorkath";
+    description = "vorkath very strict";
+    // either
+    zone {
+        x0 = 1;
+        y0 = 2;
+        x1 = 3;
+        y1 = 4;
+    }
+}
+
 if (name:"Blue dragonhide" && quantity:==1) { hidden = true; }
 
 if (name:"Dragonstone bolt tips") { hidden = true; }
