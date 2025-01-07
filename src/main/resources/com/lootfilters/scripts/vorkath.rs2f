@@ -1,17 +1,6 @@
-#define HIDE(_name) {
-    if (name:_name) { hidden = true; }
-}
-
 meta {
-    name = "strict vorkath";
+    name = "riktenx/vorkath-strict";
     description = "vorkath very strict";
-    // either
-    zone {
-        x0 = 1;
-        y0 = 2;
-        x1 = 3;
-        y1 = 4;
-    }
 }
 
 if (name:"Blue dragonhide" && quantity:==1) { hidden = true; }

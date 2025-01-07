@@ -31,10 +31,6 @@ public class MatcherConfig {
         this.display = display;
     }
 
-    public boolean test(LootFiltersPlugin plugin, TileItem item) {
-        return rule.test(plugin, item);
-    }
-
     public static MatcherConfig ownershipFilter(boolean enabled) {
         var rule = new Rule("") {
             @Override public boolean test(LootFiltersPlugin plugin, TileItem item) {

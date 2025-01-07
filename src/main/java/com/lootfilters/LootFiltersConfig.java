@@ -6,7 +6,6 @@ import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
 
 import java.awt.Color;
-import java.io.IOException;
 
 @ConfigGroup("loot-filters")
 public interface LootFiltersConfig extends Config {
@@ -21,22 +20,10 @@ public interface LootFiltersConfig extends Config {
             name = "Auto-toggle active filter",
             description = "Filters can be annotated with area boundaries in which they are relevant. If enabled, filters will automatically become active when the player enters their corresponding area.",
             section = general,
-            position = -1
+            position = 0
     )
     default boolean autoToggleFilters() {
         return true;
-    }
-    @ConfigItem(
-            keyName = "filterConfig",
-            name = "Filter config",
-            description = "The filter config.",
-            section = general,
-            position = 0
-    )
-    default String filterConfig() throws IOException {
-        try (var filter = getClass().getResourceAsStream("/com/lootfilters/scripts/riktenx.rs2f")) {
-            return new String(filter.readAllBytes());
-        }
     }
     @ConfigItem(
             keyName = "showUnmatchedItems",

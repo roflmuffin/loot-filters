@@ -1,10 +1,13 @@
 package com.lootfilters;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.google.inject.Provides;
+import com.lootfilters.util.FilterUtil;
+import com.lootfilters.util.RuneliteUtil;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
-import net.runelite.api.MenuAction;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ClientTick;
@@ -25,9 +28,12 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.lootfilters.util.RuneliteUtil.isGroundItem;
+import static java.util.Collections.emptyList;
 import static net.runelite.client.util.ColorUtil.colorTag;
 import static net.runelite.client.util.ImageUtil.loadImageResource;
 
@@ -38,6 +44,10 @@ import static net.runelite.client.util.ImageUtil.loadImageResource;
 @Getter
 public class LootFiltersPlugin extends Plugin
 {
+	public static final String CONFIG_GROUP = "loot-filters";
+	public static final String USER_FILTERS_KEY = "user-filters";
+	public static final String USER_FILTERS_INDEX_KEY = "user-filters-index";
+
 	@Inject private Client client;
 	@Inject private ClientToolbar clientToolbar;
 	@Inject private ClientThread clientThread;
@@ -55,40 +65,36 @@ public class LootFiltersPlugin extends Plugin
 
 	private LootFilter activeFilter;
 
-	private void loadFilter() throws Exception {
-		var userFilter = LootFilter.fromSource(config.filterConfig());
-
-		var matchersWithConfig = new ArrayList<MatcherConfig>();
-		matchersWithConfig.add(MatcherConfig.ownershipFilter(config.ownershipFilter()));
-
-		matchersWithConfig.addAll(userFilter.getMatchers());
-
-		matchersWithConfig.add(MatcherConfig.highlight(config.highlightedItems(), config.highlightColor()));
-		matchersWithConfig.add(MatcherConfig.hide(config.hiddenItems()));
-
-		matchersWithConfig.add(MatcherConfig.valueTier(config.enableInsaneItemValueTier(), config.insaneValue(), config.insaneValueColor(), true));
-		matchersWithConfig.add(MatcherConfig.valueTier(config.enableHighItemValueTier(), config.highValue(), config.highValueColor(), true));
-		matchersWithConfig.add(MatcherConfig.valueTier(config.enableMediumItemValueTier(), config.mediumValue(), config.mediumValueColor(), false));
-		matchersWithConfig.add(MatcherConfig.valueTier(config.enableLowItemValueTier(), config.lowValue(), config.lowValueColor(), false));
-
-		matchersWithConfig.add(MatcherConfig.showUnmatched(config.showUnmatchedItems()));
-
-		if (config.alwaysShowValue()) {
-			matchersWithConfig = activeFilter.getMatchers().stream()
-					.map(it -> new MatcherConfig(it.getRule(), it.getDisplay().toBuilder()
-							.showValue(true)
-							.build()))
-					.collect(Collectors.toCollection(ArrayList::new));
-		}
-		if (config.alwaysShowDespawn()) {
-			matchersWithConfig = activeFilter.getMatchers().stream()
-                    .map(it -> new MatcherConfig(it.getRule(), it.getDisplay().toBuilder()
-                            .showDespawn(true)
-                            .build()))
-					.collect(Collectors.toCollection(ArrayList::new));
+	public List<String> getUserFilters() {
+		var cfg = configManager.getConfiguration(CONFIG_GROUP, USER_FILTERS_KEY);
+		if (cfg == null || cfg.isEmpty()) {
+			return emptyList();
 		}
 
-		activeFilter = new LootFilter(userFilter.getName(), userFilter.getDescription(), userFilter.getActivationArea(), matchersWithConfig);
+		var type = new TypeToken<List<String>>(){}.getType();
+        return new Gson().fromJson(configManager.getConfiguration(CONFIG_GROUP, USER_FILTERS_KEY), type);
+	}
+
+	public void setUserFilters(List<String> filters) {
+		var json = new Gson().toJson(filters);
+		configManager.setConfiguration(CONFIG_GROUP, USER_FILTERS_KEY, json);
+	}
+
+	public int getUserFilterIndex() {
+		var indexCfg = configManager.getConfiguration(CONFIG_GROUP, USER_FILTERS_INDEX_KEY);
+        return indexCfg == null || indexCfg.isEmpty() ? -1 : Integer.parseInt(indexCfg);
+	}
+
+	public void setUserFilterIndex(int index) {
+		System.out.println("setUserFilterIndex " + index);
+		configManager.setConfiguration(CONFIG_GROUP, USER_FILTERS_INDEX_KEY, Integer.toString(index));
+	}
+
+	public String getUserActiveFilter() {
+		var filters = getUserFilters();
+		var index = getUserFilterIndex();
+		return filters.isEmpty() || index == -1 || index > filters.size()-1
+				? "" : filters.get(index);
 	}
 
 	@Override
@@ -107,7 +113,7 @@ public class LootFiltersPlugin extends Plugin
 	}
 
 	@Override
-	protected void shutDown() throws Exception {
+	protected void shutDown() {
 		overlayManager.remove(overlay);
 
 		tileItemIndex.clear();
@@ -123,7 +129,7 @@ public class LootFiltersPlugin extends Plugin
 
 	@Subscribe
 	public void onConfigChanged(ConfigChanged event) throws Exception {
-		if (event.getGroup().equals("loot-filters")) {
+		if (event.getGroup().equals(CONFIG_GROUP)) {
 			loadFilter();
 		}
 	}
@@ -163,7 +169,7 @@ public class LootFiltersPlugin extends Plugin
 		var wv = client.getTopLevelWorldView();
 		var seen = new HashMap<MenuEntry, Boolean>();
 		var itemCounts = Stream.of(entries)
-				.filter(this::isGroundItem)
+				.filter(RuneliteUtil::isGroundItem)
 				.collect(Collectors.groupingBy(it -> it, Collectors.counting()));
 
 		var newEntries = new ArrayList<MenuEntry>();
@@ -200,13 +206,8 @@ public class LootFiltersPlugin extends Plugin
 		client.getMenu().setMenuEntries(newEntries.toArray(MenuEntry[]::new));
 	}
 
-	private boolean isGroundItem(MenuEntry entry) {
-		var type = entry.getType();
-		return type == MenuAction.GROUND_ITEM_FIRST_OPTION
-				|| type == MenuAction.GROUND_ITEM_SECOND_OPTION
-				|| type == MenuAction.GROUND_ITEM_THIRD_OPTION
-				|| type == MenuAction.GROUND_ITEM_FOURTH_OPTION
-				|| type == MenuAction.GROUND_ITEM_FIFTH_OPTION
-				|| type == MenuAction.EXAMINE_ITEM_GROUND;
+	private void loadFilter() throws Exception {
+		var userFilter = LootFilter.fromSource(getUserActiveFilter());
+		activeFilter = FilterUtil.withConfigMatchers(userFilter, config);
 	}
 }
