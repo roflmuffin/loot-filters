@@ -1,17 +1,21 @@
 package com.lootfilters;
 
 import com.google.gson.GsonBuilder;
+import com.lootfilters.lang.Lexer;
+import com.lootfilters.lang.Parser;
 import com.lootfilters.rule.Rule;
 import com.lootfilters.serde.ColorDeserializer;
 import com.lootfilters.serde.ColorSerializer;
 import com.lootfilters.serde.RuleDeserializer;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import net.runelite.api.TileItem;
 
 import java.awt.Color;
 import java.util.List;
 
+@Getter
 @AllArgsConstructor
 @EqualsAndHashCode
 public class LootFilter {
@@ -24,6 +28,11 @@ public class LootFilter {
                 .registerTypeAdapter(Rule.class, new RuleDeserializer())
                 .create();
         return gson.fromJson(json, LootFilter.class);
+    }
+
+    public static LootFilter fromSource(String source) throws Exception {
+        var tokens = new Lexer(source).tokenize();
+        return new Parser(tokens).parse();
     }
 
     public String toJson() {

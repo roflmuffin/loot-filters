@@ -1,8 +1,6 @@
 package com.lootfilters;
 
 import com.google.inject.Provides;
-import com.lootfilters.lang.Lexer;
-import com.lootfilters.lang.Parser;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
@@ -26,11 +24,9 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.lootfilters.MatcherConfig.findMatch;
 import static net.runelite.client.util.ColorUtil.colorTag;
 import static net.runelite.client.util.ImageUtil.loadImageResource;
 
@@ -56,47 +52,49 @@ public class LootFiltersPlugin extends Plugin
 	private final TileItemIndex tileItemIndex = new TileItemIndex();
 	private final LootbeamIndex lootbeamIndex = new LootbeamIndex();
 
-	private List<MatcherConfig> matcherConfigs;
+	private LootFilter activeFilter;
 
-	private void loadFilterConfig() throws Exception {
-		var userFilters = new Parser(new Lexer(config.filterConfig()).tokenize()).parse();
+	private void loadFilter() throws Exception {
+		var userFilter = LootFilter.fromSource(config.filterConfig());
 
-		matcherConfigs = new ArrayList<>();
-		matcherConfigs.add(MatcherConfig.ownershipFilter(config.ownershipFilter()));
+		var matchersWithConfig = new ArrayList<MatcherConfig>();
+		matchersWithConfig.add(MatcherConfig.ownershipFilter(config.ownershipFilter()));
 
-		matcherConfigs.addAll(userFilters);
+		matchersWithConfig.addAll(userFilter.getMatchers());
 
-		matcherConfigs.add(MatcherConfig.highlight(config.highlightedItems(), config.highlightColor()));
-		matcherConfigs.add(MatcherConfig.hide(config.hiddenItems()));
+		matchersWithConfig.add(MatcherConfig.highlight(config.highlightedItems(), config.highlightColor()));
+		matchersWithConfig.add(MatcherConfig.hide(config.hiddenItems()));
 
-		matcherConfigs.add(MatcherConfig.valueTier(config.enableInsaneItemValueTier(), config.insaneValue(), config.insaneValueColor(), true));
-		matcherConfigs.add(MatcherConfig.valueTier(config.enableHighItemValueTier(), config.highValue(), config.highValueColor(), true));
-		matcherConfigs.add(MatcherConfig.valueTier(config.enableMediumItemValueTier(), config.mediumValue(), config.mediumValueColor(), false));
-		matcherConfigs.add(MatcherConfig.valueTier(config.enableLowItemValueTier(), config.lowValue(), config.lowValueColor(), false));
+		matchersWithConfig.add(MatcherConfig.valueTier(config.enableInsaneItemValueTier(), config.insaneValue(), config.insaneValueColor(), true));
+		matchersWithConfig.add(MatcherConfig.valueTier(config.enableHighItemValueTier(), config.highValue(), config.highValueColor(), true));
+		matchersWithConfig.add(MatcherConfig.valueTier(config.enableMediumItemValueTier(), config.mediumValue(), config.mediumValueColor(), false));
+		matchersWithConfig.add(MatcherConfig.valueTier(config.enableLowItemValueTier(), config.lowValue(), config.lowValueColor(), false));
 
-		matcherConfigs.add(MatcherConfig.showUnmatched(config.showUnmatchedItems()));
+		matchersWithConfig.add(MatcherConfig.showUnmatched(config.showUnmatchedItems()));
 
 		if (config.alwaysShowValue()) {
-			matcherConfigs = matcherConfigs.stream()
+			matchersWithConfig = activeFilter.getMatchers().stream()
 					.map(it -> new MatcherConfig(it.getRule(), it.getDisplay().toBuilder()
 							.showValue(true)
 							.build()))
-					.collect(Collectors.toList());
+					.collect(Collectors.toCollection(ArrayList::new));
 		}
 		if (config.alwaysShowDespawn()) {
-			matcherConfigs = matcherConfigs.stream()
-					.map(it -> new MatcherConfig(it.getRule(), it.getDisplay().toBuilder()
-							.showDespawn(true)
-							.build()))
-					.collect(Collectors.toList());
+			matchersWithConfig = activeFilter.getMatchers().stream()
+                    .map(it -> new MatcherConfig(it.getRule(), it.getDisplay().toBuilder()
+                            .showDespawn(true)
+                            .build()))
+					.collect(Collectors.toCollection(ArrayList::new));
 		}
+
+		activeFilter = new LootFilter(userFilter.getName(), matchersWithConfig);
 	}
 
 	@Override
 	protected void startUp() throws Exception {
 		overlayManager.add(overlay);
 
-		loadFilterConfig();
+		loadFilter();
 
 		pluginPanel = new LootFiltersPanel(this);
 		pluginPanelNav = NavigationButton.builder()
@@ -125,7 +123,7 @@ public class LootFiltersPlugin extends Plugin
 	@Subscribe
 	public void onConfigChanged(ConfigChanged event) throws Exception {
 		if (event.getGroup().equals("loot-filters")) {
-			loadFilterConfig();
+			loadFilter();
 		}
 	}
 
@@ -136,14 +134,12 @@ public class LootFiltersPlugin extends Plugin
 		tileItemIndex.put(tile, item);
 
 		// lootbeams
-		var match = matcherConfigs.stream()
-				.filter(it -> it.test(this, item))
-				.findFirst().orElse(null);
-		if (match == null || !match.getDisplay().isShowLootbeam()) {
+		var match = activeFilter.findMatch(this, item);
+		if (match == null || !match.isShowLootbeam()) {
 			return;
 		}
 
-		var beam = new Lootbeam(client, clientThread, tile.getWorldLocation(), match.getDisplay().getTextColor(), Lootbeam.Style.MODERN);
+		var beam = new Lootbeam(client, clientThread, tile.getWorldLocation(), match.getTextColor(), Lootbeam.Style.MODERN);
 		lootbeamIndex.put(tile, item, beam);
 	}
 
@@ -184,7 +180,7 @@ public class LootFiltersPlugin extends Plugin
 
 			var point = WorldPoint.fromScene(wv, entry.getParam0(), entry.getParam1(), wv.getPlane());
 			var item = tileItemIndex.findItem(point, entry.getIdentifier());
-			var match = findMatch(matcherConfigs, this, item);
+			var match = activeFilter.findMatch(this, item);
 			if (match != null && !match.isHidden()) {
 				if (itemCounts.get(entry) > 1) {
 					entry.setTarget(colorTag(match.getTextColor()) + itemManager.getItemComposition(item.getId()).getName() + " x" + itemCounts.get(entry));

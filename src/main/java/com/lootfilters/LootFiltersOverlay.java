@@ -40,7 +40,7 @@ public class LootFiltersOverlay extends Overlay {
 
     @Override
     public Dimension render(Graphics2D g) {
-        var filters = plugin.getMatcherConfigs();
+        var activeFilter = plugin.getActiveFilter();
         for (var entry : plugin.getTileItemIndex().entrySet()) {
             var items = entry.getValue();
             var itemCounts = items.stream()
@@ -54,15 +54,12 @@ public class LootFiltersOverlay extends Overlay {
                         .filter(it -> it.getId() == id)
                         .findFirst().orElseThrow();
 
-                var match = filters.stream()
-                        .filter(it -> it.test(plugin, item))
-                        .findFirst().orElse(null);
-                if (match == null || match.getDisplay().isHidden()) {
+                var match = activeFilter.findMatch(plugin, item);
+                if (match == null || match.isHidden()) {
                     continue;
                 }
 
-                var display = match.getDisplay();
-                var displayText = buildDisplayText(item, count, display);
+                var displayText = buildDisplayText(item, count, match);
 
                 var loc = LocalPoint.fromWorld(client.getTopLevelWorldView(), tile.getWorldLocation());
                 if (loc == null) {
@@ -84,11 +81,11 @@ public class LootFiltersOverlay extends Overlay {
                 var text = new TextComponent();
                 text.setText(displayText);
                 text.setFont(getRunescapeSmallFont());
-                text.setColor(display.getTextColor());
+                text.setColor(match.getTextColor());
                 text.setPosition(new Point(textPoint.getX(), textPoint.getY() - currentOffset));
 
-                if (display.getBackgroundColor() != null) {
-                    g.setColor(display.getBackgroundColor());
+                if (match.getBackgroundColor() != null) {
+                    g.setColor(match.getBackgroundColor());
                     g.fillRect(
                             textPoint.getX() - BOX_PAD,
                             textPoint.getY() - currentOffset - textHeight - BOX_PAD,
@@ -96,8 +93,8 @@ public class LootFiltersOverlay extends Overlay {
                             textHeight + 2*BOX_PAD
                     );
                 }
-                if (display.getBorderColor() != null) {
-                    g.setColor(display.getBorderColor());
+                if (match.getBorderColor() != null) {
+                    g.setColor(match.getBorderColor());
                     g.drawRect(
                             textPoint.getX() - BOX_PAD,
                             textPoint.getY() - currentOffset - textHeight - BOX_PAD,
@@ -108,7 +105,7 @@ public class LootFiltersOverlay extends Overlay {
 
                 text.render(g);
 
-                if (display.isShowDespawn()) {
+                if (match.isShowDespawn()) {
                     var ticksRemaining = item.getDespawnTime() - client.getTickCount();
                     if (ticksRemaining < 0) { // doesn't despawn
                         continue;

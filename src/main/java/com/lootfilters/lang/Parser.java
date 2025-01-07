@@ -1,6 +1,7 @@
 package com.lootfilters.lang;
 
 import com.lootfilters.DisplayConfig;
+import com.lootfilters.LootFilter;
 import com.lootfilters.MatcherConfig;
 import com.lootfilters.rule.AndRule;
 import com.lootfilters.rule.Comparator;
@@ -40,7 +41,7 @@ public class Parser {
         this.tokens = new TokenStream(tokens);
     }
 
-    public List<MatcherConfig> parse() throws Exception {
+    public LootFilter parse() throws Exception {
         while (tokens.isNotEmpty()) {
             var first = tokens.take();
             if (first.is(IF)) {
@@ -49,7 +50,7 @@ public class Parser {
                 throw new Exception("unexpected token " + first.getType());
             }
         }
-        return filters;
+        return new LootFilter("", filters);
     }
 
     private void parseFilterConfig() {
