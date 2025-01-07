@@ -1,6 +1,10 @@
 meta {
-    name = "riktenx/vorkath-strict";
-    description = "vorkath very strict";
+    name = "riktenx/vorkath";
+    description = "main-game vorkath loot filter";
+    area = [
+        2240, 4032, 0,
+        2303, 4095, 0,
+    ];
 }
 
 if (name:"Blue dragonhide" && quantity:==1) { hidden = true; }

@@ -11,8 +11,6 @@ import com.lootfilters.rule.ItemQuantityRule;
 import com.lootfilters.rule.ItemValueRule;
 import com.lootfilters.rule.OrRule;
 import com.lootfilters.rule.Rule;
-import net.runelite.api.coords.LocalPoint;
-import net.runelite.api.coords.WorldPoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,32 +65,34 @@ public class Parser {
 
     private void parseMeta() {
         var block = tokens.takeBlock();
-        var tok = block.takeExpect(IDENTIFIER);
-        block.takeExpect(ASSIGN);
-        switch (tok.getValue()) {
-            case "name":
-                name = block.takeExpectLiteral().expectString();
-                block.takeExpect(STMT_END);
-                break;
-            case "description":
-                description = block.takeExpectLiteral().expectString();
-                block.takeExpect(STMT_END);
-                break;
-            case "area":
-                block.takeExpect(LIST_START);
-                int x0 = block.takeExpectLiteral().expectInt(); block.takeExpect(COMMA);
-                int y0 = block.takeExpectLiteral().expectInt(); block.takeExpect(COMMA);
-                int z0 = block.takeExpectLiteral().expectInt(); block.takeExpect(COMMA);
-                int x1 = block.takeExpectLiteral().expectInt(); block.takeExpect(COMMA);
-                int y1 = block.takeExpectLiteral().expectInt(); block.takeExpect(COMMA);
-                int z1 = block.takeExpectLiteral().expectInt(); block.takeOptional(COMMA);
-                block.takeExpect(LIST_END);
-                block.takeExpect(STMT_END);
+        while (block.isNotEmpty()) {
+            var tok = block.takeExpect(IDENTIFIER);
+            block.takeExpect(ASSIGN);
+            switch (tok.getValue()) {
+                case "name":
+                    name = block.takeExpectLiteral().expectString();
+                    block.takeExpect(STMT_END);
+                    break;
+                case "description":
+                    description = block.takeExpectLiteral().expectString();
+                    block.takeExpect(STMT_END);
+                    break;
+                case "area":
+                    block.takeExpect(LIST_START);
+                    int x0 = block.takeExpectLiteral().expectInt(); block.takeExpect(COMMA);
+                    int y0 = block.takeExpectLiteral().expectInt(); block.takeExpect(COMMA);
+                    int z0 = block.takeExpectLiteral().expectInt(); block.takeExpect(COMMA);
+                    int x1 = block.takeExpectLiteral().expectInt(); block.takeExpect(COMMA);
+                    int y1 = block.takeExpectLiteral().expectInt(); block.takeExpect(COMMA);
+                    int z1 = block.takeExpectLiteral().expectInt(); block.takeOptional(COMMA);
+                    block.takeExpect(LIST_END);
+                    block.takeExpect(STMT_END);
 
-                activationArea = new int[]{x0,y0,z0,x1,y1,z1};
-                break;
-            default:
-                throw new ParseException("unrecognized metavalue", tok);
+                    activationArea = new int[]{x0,y0,z0,x1,y1,z1};
+                    break;
+                default:
+                    throw new ParseException("unrecognized metavalue", tok);
+            }
         }
     }
 

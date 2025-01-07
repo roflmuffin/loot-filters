@@ -15,6 +15,10 @@ public class TextUtil {
         return text;
     }
 
+    public static String quote(String text) {
+        return '"' + text + '"';
+    }
+
     public static boolean isWhitespace(char c) {
         return c == ' ' || c == '\t' || c == '\n' || c == '\r';
     }

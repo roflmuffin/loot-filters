@@ -3,10 +3,10 @@ package com.lootfilters;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.inject.Provides;
-import com.lootfilters.util.FilterUtil;
 import com.lootfilters.util.RuneliteUtil;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.coords.WorldPoint;
@@ -29,10 +29,13 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.lootfilters.util.FilterUtil.withConfigMatchers;
 import static com.lootfilters.util.RuneliteUtil.isGroundItem;
+import static com.lootfilters.util.TextUtil.quote;
 import static java.util.Collections.emptyList;
 import static net.runelite.client.util.ColorUtil.colorTag;
 import static net.runelite.client.util.ImageUtil.loadImageResource;
@@ -42,8 +45,7 @@ import static net.runelite.client.util.ImageUtil.loadImageResource;
 	name = "Loot Filters"
 )
 @Getter
-public class LootFiltersPlugin extends Plugin
-{
+public class LootFiltersPlugin extends Plugin {
 	public static final String CONFIG_GROUP = "loot-filters";
 	public static final String USER_FILTERS_KEY = "user-filters";
 	public static final String USER_FILTERS_INDEX_KEY = "user-filters-index";
@@ -64,6 +66,13 @@ public class LootFiltersPlugin extends Plugin
 	private final LootbeamIndex lootbeamIndex = new LootbeamIndex();
 
 	private LootFilter activeFilter;
+	private LootFilter currentAreaFilter;
+
+	private List<LootFilter> parsedUserFilters;
+
+	public LootFilter getActiveFilter() {
+		return currentAreaFilter != null ? currentAreaFilter : activeFilter;
+	}
 
 	public List<String> getUserFilters() {
 		var cfg = configManager.getConfiguration(CONFIG_GROUP, USER_FILTERS_KEY);
@@ -76,6 +85,15 @@ public class LootFiltersPlugin extends Plugin
 	}
 
 	public void setUserFilters(List<String> filters) {
+		parsedUserFilters = new ArrayList<>();
+		for (var filter : filters) {
+			try {
+				parsedUserFilters.add(LootFilter.fromSource(filter));
+			} catch (Exception e) {
+				// pass - shouldn't occur, filters are vetted before this point
+			}
+		}
+
 		var json = new Gson().toJson(filters);
 		configManager.setConfiguration(CONFIG_GROUP, USER_FILTERS_KEY, json);
 	}
@@ -97,11 +115,18 @@ public class LootFiltersPlugin extends Plugin
 				? "" : filters.get(index);
 	}
 
+	public void addPluginChatMessage(String msg) {
+		clientThread.invoke(() -> {
+			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", msg, "loot-filters", false);
+		});
+	}
+
 	@Override
 	protected void startUp() throws Exception {
 		overlayManager.add(overlay);
 
 		loadFilter();
+		setUserFilters(getUserFilters()); // round-trip on startup to parse everything into memory
 
 		pluginPanel = new LootFiltersPanel(this);
 		pluginPanelNav = NavigationButton.builder()
@@ -129,9 +154,14 @@ public class LootFiltersPlugin extends Plugin
 
 	@Subscribe
 	public void onConfigChanged(ConfigChanged event) throws Exception {
-		if (event.getGroup().equals(CONFIG_GROUP)) {
-			loadFilter();
+		if (!event.getGroup().equals(CONFIG_GROUP)) {
+			return;
 		}
+
+		loadFilter();
+		if (!config.autoToggleFilters()) {
+			currentAreaFilter = null;
+		} // if we're transitioning TO enabled, do nothing - onGameTick() will handle it
 	}
 
 	@Subscribe
@@ -141,7 +171,7 @@ public class LootFiltersPlugin extends Plugin
 		tileItemIndex.put(tile, item);
 
 		// lootbeams
-		var match = activeFilter.findMatch(this, item);
+		var match = getActiveFilter().findMatch(this, item);
 		if (match == null || !match.isShowLootbeam()) {
 			return;
 		}
@@ -160,7 +190,7 @@ public class LootFiltersPlugin extends Plugin
 
 	@Subscribe
 	public void onGameTick(GameTick event) {
-		//
+		scanAreaFilter();
 	}
 
 	@Subscribe
@@ -192,7 +222,7 @@ public class LootFiltersPlugin extends Plugin
 
 			var point = WorldPoint.fromScene(wv, entry.getParam0(), entry.getParam1(), wv.getPlane());
 			var item = tileItemIndex.findItem(point, entry.getIdentifier());
-			var match = activeFilter.findMatch(this, item);
+			var match = getActiveFilter().findMatch(this, item);
 			if (match != null && !match.isHidden()) {
 				if (itemCounts.get(entry) > 1) {
 					entry.setTarget(colorTag(match.getTextColor()) + itemManager.getItemComposition(item.getId()).getName() + " x" + itemCounts.get(entry));
@@ -208,6 +238,29 @@ public class LootFiltersPlugin extends Plugin
 
 	private void loadFilter() throws Exception {
 		var userFilter = LootFilter.fromSource(getUserActiveFilter());
-		activeFilter = FilterUtil.withConfigMatchers(userFilter, config);
+		activeFilter = withConfigMatchers(userFilter, config);
+	}
+
+	private void scanAreaFilter() {
+		if (!config.autoToggleFilters()) {
+			return;
+		}
+
+		var player = client.getLocalPlayer();
+		if (player == null) {
+			return;
+		}
+
+		var p = player.getWorldLocation();
+		var match = parsedUserFilters.stream()
+				.filter(it -> it.isInActivationArea(p))
+				.findFirst().orElse(null);
+		if (match != null && (currentAreaFilter == null || !Objects.equals(match.getName(), currentAreaFilter.getName()))) {
+			addPluginChatMessage("Entering area for filter " + quote(match.getName()));
+			currentAreaFilter = withConfigMatchers(match, config);
+		} else if (match == null && currentAreaFilter != null) {
+			addPluginChatMessage("Leaving area for filter " + quote(currentAreaFilter.getName()));
+			currentAreaFilter = null;
+		}
 	}
 }

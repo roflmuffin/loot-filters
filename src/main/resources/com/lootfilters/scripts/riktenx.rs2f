@@ -1,3 +1,7 @@
 meta {
     name = "riktenx/main";
 }
+
+if (quantity:>0) {
+    showLootbeam = true;
+}

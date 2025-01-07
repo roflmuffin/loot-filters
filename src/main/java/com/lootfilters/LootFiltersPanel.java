@@ -14,6 +14,7 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.util.ArrayList;
 
+import static com.lootfilters.util.TextUtil.quote;
 import static java.util.Collections.emptyList;
 import static net.runelite.client.util.ImageUtil.loadImageResource;
 
@@ -116,10 +117,7 @@ public class LootFiltersPanel extends PluginPanel {
             }
 
             plugin.setUserFilterIndex(newIndex);
-            plugin.getClientThread().invoke(() -> {
-                var msg = "Loading filter \"" + filterSelect.getSelectedItem() + "\"...";
-                plugin.getClient().addChatMessage(ChatMessageType.GAMEMESSAGE, "", msg, "");
-            });
+            plugin.addPluginChatMessage("Loading filter " + quote((String) filterSelect.getSelectedItem()));
         });
         main.add(filterSelect);
 
