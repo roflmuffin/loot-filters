@@ -130,6 +130,7 @@ public class TokenStream {
     }
 
     public boolean isNotEmpty() {
-        return !tokens.isEmpty();
+        return tokens.stream()
+                .anyMatch(it -> !it.is(Token.Type.WHITESPACE));
     }
 }

@@ -104,7 +104,6 @@ public class LootFiltersPlugin extends Plugin {
 	}
 
 	public void setUserFilterIndex(int index) {
-		System.out.println("setUserFilterIndex " + index);
 		configManager.setConfiguration(CONFIG_GROUP, USER_FILTERS_INDEX_KEY, Integer.toString(index));
 	}
 
@@ -251,7 +250,7 @@ public class LootFiltersPlugin extends Plugin {
 			return;
 		}
 
-		var p = player.getWorldLocation();
+		var p = WorldPoint.fromLocalInstance(client, player.getLocalLocation());
 		var match = parsedUserFilters.stream()
 				.filter(it -> it.isInActivationArea(p))
 				.findFirst().orElse(null);
