@@ -7,11 +7,10 @@ import lombok.Value;
 @RequiredArgsConstructor
 public class Token {
     public enum Type {
-        WHITESPACE,
+        WHITESPACE, NEWLINE,
         IF,
         META,
-        COLON,
-        COMMA,
+        COLON, COMMA,
         TRUE, FALSE,
         IDENTIFIER,
         LITERAL_INT, LITERAL_STRING,
@@ -21,24 +20,12 @@ public class Token {
         BLOCK_START, BLOCK_END,
         LIST_START, LIST_END,
         STMT_END,
+        PREPROC_DEFINE,
     }
 
-    public static Token Static(Type type) { return new Token(type, null); }
-    public static Token IntLiteral(String value) { return new Token(Type.LITERAL_INT, value); }
-    public static Token StringLiteral(String value) { return new Token(Type.LITERAL_STRING, value); }
-    public static Token Identifier(String value) { return new Token(Type.IDENTIFIER, value); }
-
-    public static final Token Equals = new Token(Type.OP_EQ, null);
-    public static final Token GreaterThan = new Token(Type.OP_GT, null);
-    public static final Token LessThan = new Token(Type.OP_LT, null);
-    public static final Token GreaterThanOrEqual = new Token(Type.OP_GTEQ, null);
-    public static final Token LessThanOrEqual = new Token(Type.OP_LTEQ, null);
-    public static final Token And = new Token(Type.OP_AND, null);
-    public static final Token Or = new Token(Type.OP_OR, null);
-    public static final Token StartExpr = new Token(Type.EXPR_START, null);
-    public static final Token EndExpr = new Token(Type.EXPR_END, null);
-    public static final Token EndStatement = new Token(Type.STMT_END, null);
-    public static final Token Whitespace = new Token(Type.WHITESPACE, null);
+    public static Token intLiteral(String value) { return new Token(Type.LITERAL_INT, value); }
+    public static Token stringLiteral(String value) { return new Token(Type.LITERAL_STRING, value); }
+    public static Token identifier(String value) { return new Token(Type.IDENTIFIER, value); }
 
     Type type;
     String value;
@@ -68,6 +55,10 @@ public class Token {
             default:
                 throw new ParseException("unexpected non-boolean token", this);
         }
+    }
+
+    public boolean isWhitespace() {
+        return type == Type.WHITESPACE || type == Type.NEWLINE;
     }
 
     @Override

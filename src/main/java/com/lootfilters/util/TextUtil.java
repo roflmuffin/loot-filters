@@ -1,19 +1,9 @@
 package com.lootfilters.util;
 
-import net.runelite.api.TileItem;
-
 import java.awt.Color;
 
 public class TextUtil {
     private TextUtil() {}
-
-    public static String getBaseDisplayText(TileItem item, String name) {
-        var text = name;
-        if (item.getQuantity() > 1) {
-            text += " (" + item.getQuantity() + ")";
-        }
-        return text;
-    }
 
     public static String quote(String text) {
         return '"' + text + '"';
@@ -56,5 +46,11 @@ public class TextUtil {
             return String.format("%.2fK", (float)value / 1e3);
         }
         return value + "gp";
+    }
+
+    public static String normalizeCrlf(String str) {
+        return str
+                .replaceAll("\r\n", "\n")
+                .replaceAll("\r", "\n");
     }
 }

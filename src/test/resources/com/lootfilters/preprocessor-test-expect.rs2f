@@ -1,0 +1,7 @@
+if (value:>10000000) {
+    color = "ff00ff00";
+    showLootbeam = true;
+}
+
+if (name:"dragon crossbow") { hidden = true; }
+if (name:"zaryte crossbow") { color = "ff00ff00"; }

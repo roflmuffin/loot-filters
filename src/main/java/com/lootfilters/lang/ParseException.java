@@ -3,7 +3,7 @@ package com.lootfilters.lang;
 import lombok.Getter;
 
 @Getter
-public class ParseException extends RuntimeException {
+public class ParseException extends CompileException {
     private final Token token;
 
     public ParseException(String message, Token token) {

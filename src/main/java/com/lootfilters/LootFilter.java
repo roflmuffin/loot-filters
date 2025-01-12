@@ -1,6 +1,7 @@
 package com.lootfilters;
 
 import com.google.gson.GsonBuilder;
+import com.lootfilters.lang.CompileException;
 import com.lootfilters.lang.Lexer;
 import com.lootfilters.lang.Parser;
 import com.lootfilters.rule.Rule;
@@ -33,7 +34,7 @@ public class LootFilter {
         return gson.fromJson(json, LootFilter.class);
     }
 
-    public static LootFilter fromSource(String source) throws Exception {
+    public static LootFilter fromSource(String source) throws CompileException {
         var tokens = new Lexer(source).tokenize();
         return new Parser(tokens).parse();
     }

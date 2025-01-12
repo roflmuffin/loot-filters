@@ -13,5 +13,6 @@ public class ParserTest {
         var tokens = new Lexer(input).tokenize();
         var parser = new Parser(tokens);
         var actual = parser.parse();
+        System.out.println(actual);
     }
 }

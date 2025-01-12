@@ -13,6 +13,7 @@ import static com.lootfilters.util.TextUtil.isWhitespace;
 @RequiredArgsConstructor
 public class Lexer {
     private static final LinkedHashMap<String, Token.Type> STATICS = new LinkedHashMap<>() {{
+        put("#define", Token.Type.PREPROC_DEFINE);
         put("false", Token.Type.FALSE);
         put("true", Token.Type.TRUE);
         put("meta", Token.Type.META);
@@ -34,29 +35,45 @@ public class Lexer {
         put("}", Token.Type.BLOCK_END);
         put("[", Token.Type.LIST_START);
         put("]", Token.Type.LIST_END);
+        put("\n", Token.Type.NEWLINE);
+        put("\r", Token.Type.NEWLINE);
     }};
 
     private final String input;
     private final List<Token> tokens = new ArrayList<>();
     private int offset = 0;
 
-    public List<Token> tokenize() throws Exception {
+    public List<Token> tokenize() throws TokenizeException {
+        var skipWhitespace = false;
         while (offset < input.length()) {
             if (tokenizeStatic()) {
                 continue;
             }
 
             var ch = input.charAt(offset);
+            if (ch == '\\') {
+                skipWhitespace = true;
+                ++offset;
+                continue;
+            }
             if (isWhitespace(ch)) {
-                tokenizeWhitespace();
-            } else if (isNumeric(ch)) {
+                if (skipWhitespace) {
+                    ++offset;
+                } else {
+                    tokenizeWhitespace();
+                }
+                continue;
+            }
+
+            skipWhitespace = false;
+            if (isNumeric(ch)) {
                 tokenizeLiteralInt();
             } else if (ch == '"') {
                 tokenizeLiteralString();
             } else if (isLegalIdent(ch)) {
                 tokenizeIdentifier();
             } else {
-                throw new Exception("unrecognized character '" + ch + "'");
+                throw new TokenizeException("unrecognized character '" + ch + "'");
             }
         }
 
@@ -68,7 +85,7 @@ public class Lexer {
             var value = entry.getKey();
             var type = entry.getValue();
             if (input.startsWith(value, offset)) {
-                tokens.add(Token.Static(type));
+                tokens.add(new Token(type, value));
                 offset += value.length();
                 return true;
             }
@@ -79,12 +96,13 @@ public class Lexer {
     private void tokenizeWhitespace() {
         for (int i = offset; i < input.length(); ++i) {
             if (!isWhitespace(input.charAt(i))) {
-                tokens.add(Token.Whitespace);
+                var ws = input.substring(offset, i);
+                tokens.add(new Token(Token.Type.WHITESPACE, ws));
                 offset += i - offset;
                 return;
             }
         }
-        tokens.add(Token.Whitespace);
+        tokens.add(new Token(Token.Type.WHITESPACE, input.substring(offset)));
         offset = input.length();
     }
 
@@ -92,37 +110,37 @@ public class Lexer {
         for (int i = offset; i < input.length(); ++i) {
             if (!isNumeric(input.charAt(i))) {
                 var literal = input.substring(offset, i);
-                tokens.add(Token.IntLiteral(literal));
+                tokens.add(Token.intLiteral(literal));
                 offset += literal.length();
                 return;
             }
         }
-        tokens.add(Token.IntLiteral(input.substring(offset)));
+        tokens.add(Token.intLiteral(input.substring(offset)));
         offset = input.length();
     }
 
-    private void tokenizeLiteralString() throws Exception {
+    private void tokenizeLiteralString() throws TokenizeException {
         for (int i = offset+1; i < input.length(); ++i) {
             if (input.charAt(i) == '"') {
                 var literal = input.substring(offset+1, i);
-                tokens.add(Token.StringLiteral(literal));
+                tokens.add(Token.stringLiteral(literal));
                 offset += literal.length() + 2; // for quotes, which the captured literal omits
                 return;
             }
         }
-        throw new Exception("unterminated string literal");
+        throw new TokenizeException("unterminated string literal");
     }
 
     private void tokenizeIdentifier() {
         for (int i = offset; i < input.length(); ++i) {
             if (!isLegalIdent(input.charAt(i))) {
                 var ident = input.substring(offset, i);
-                tokens.add(Token.Identifier(ident));
+                tokens.add(Token.identifier(ident));
                 offset += ident.length();
                 return;
             }
         }
-        tokens.add(Token.Identifier(input.substring(offset)));
+        tokens.add(Token.identifier(input.substring(offset)));
         offset = input.length();
     }
 }
