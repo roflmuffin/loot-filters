@@ -1,6 +1,7 @@
 package com.lootfilters.util;
 
 import java.awt.Color;
+import java.io.IOException;
 
 public class TextUtil {
     private TextUtil() {}
@@ -52,5 +53,12 @@ public class TextUtil {
         return str
                 .replaceAll("\r\n", "\n")
                 .replaceAll("\r", "\n");
+    }
+
+    public static String loadFilterScript(String resource) throws IOException {
+        try (var r = TextUtil.class.getResourceAsStream("/com/lootfilters/scripts/" + resource)) {
+            assert r != null;
+            return normalizeCrlf(new String(r.readAllBytes()));
+        }
     }
 }

@@ -8,12 +8,16 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
+import java.io.IOException;
 import java.util.ArrayList;
 
+import static com.lootfilters.util.CollectionUtil.append;
+import static com.lootfilters.util.FilterUtil.configToFilterSource;
 import static com.lootfilters.util.TextUtil.quote;
 import static java.util.Collections.emptyList;
 import static net.runelite.client.util.ImageUtil.loadImageResource;
@@ -40,8 +44,8 @@ public class LootFiltersPanel extends PluginPanel {
 
         var filterSelect = new JComboBox<String>();
 
-        var addButton = new JButton("", new ImageIcon(placeholder));
-        addButton.addActionListener(it -> {
+        var importClipboard = new JButton("", new ImageIcon(placeholder));
+        importClipboard.addActionListener(it -> {
             String source;
             try {
                 source = getClipboard();
@@ -77,12 +81,43 @@ public class LootFiltersPanel extends PluginPanel {
             plugin.setUserFilters(newCfg);
         });
 
-        addButton.setBorder(null);
-        top.add(addButton);
+        importClipboard.setBorder(null);
+        importClipboard.setToolTipText("Import a new filter from the clipboard.");
+        top.add(importClipboard);
 
-        var deleteButton = new JButton("", new ImageIcon(placeholder));
-        deleteButton.setBorder(null);
-        deleteButton.addActionListener(it -> {
+        var importConfig = new JButton("", new ImageIcon(placeholder));
+        importConfig.setToolTipText("Import the current general config (highlight, hide, and item value tiers) to a new filter");
+        importConfig.setBorder(null);
+        importConfig.addActionListener(it -> {
+            var initialName = plugin.getClient().getLocalPlayer() != null
+                    ? plugin.getClient().getLocalPlayer().getName() + "/"
+                    : "player/";
+            var finalName = JOptionPane.showInputDialog(this, "Enter a filter name:", initialName);
+            if (finalName == null) {
+                return;
+            }
+
+            var src = configToFilterSource(plugin.getConfig(), finalName);
+            LootFilter newFilter;
+            try {
+                newFilter = LootFilter.fromSource(src);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            filterSelect.addItem(newFilter.getName());
+            plugin.setUserFilters(append(plugin.getUserFilters(), src));
+        });
+        top.add(importConfig);
+
+        var deleteActive = new JButton("", new ImageIcon(placeholder));
+        deleteActive.setToolTipText("Delete the currently active filter.");
+        deleteActive.setBorder(null);
+        deleteActive.addActionListener(it -> {
+            var result = JOptionPane.showConfirmDialog(deleteActive, "Delete the active loot filter?", "Confirm", JOptionPane.YES_NO_OPTION);
+            if (result != JOptionPane.YES_OPTION) {
+                return;
+            }
+
             var index = filterSelect.getSelectedIndex();
             if (plugin.getUserFilters().isEmpty() || index == -1) {
                 return;
@@ -96,7 +131,7 @@ public class LootFiltersPanel extends PluginPanel {
             plugin.setUserFilters(newCfg);
             plugin.setUserFilterIndex(-1);
         });
-        top.add(deleteButton);
+        top.add(deleteActive);
 
         main.add(top);
 
@@ -121,8 +156,17 @@ public class LootFiltersPanel extends PluginPanel {
         });
         main.add(filterSelect);
 
-        var deleteAll = new JButton("", new ImageIcon(placeholder));
+        var deleteAll = new JButton("Delete all");
         deleteAll.addActionListener(it -> {
+            var result = JOptionPane.showConfirmDialog(deleteActive, "Delete all loot filters?", "Confirm", JOptionPane.YES_NO_OPTION);
+            if (result != JOptionPane.YES_OPTION) {
+                return;
+            }
+            var actually = JOptionPane.showConfirmDialog(deleteActive, "Are you sure?", "Really Confirm", JOptionPane.YES_NO_OPTION);
+            if (actually != JOptionPane.YES_OPTION) {
+                return;
+            }
+
             filterSelect.removeAllItems();
             filterSelect.setSelectedIndex(-1);
 

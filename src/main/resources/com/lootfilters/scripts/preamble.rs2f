@@ -1,0 +1,2 @@
+#define HIGHLIGHT(_name, _color) if (name:_name) { color = _color; }
+#define HIDE(_name) if (name:_name) { hidden = true; }
