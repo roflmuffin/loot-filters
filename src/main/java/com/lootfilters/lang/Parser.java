@@ -143,26 +143,19 @@ public class Parser {
             switch (assign[0].getValue()) {
                 case "textColor":
                 case "color":
-                    builder.textColor(parseArgb(assign[1].expectString()));
-                    break;
+                    builder.textColor(parseArgb(assign[1].expectString())); break;
                 case "backgroundColor":
-                    builder.backgroundColor(parseArgb(assign[1].expectString()));
-                    break;
+                    builder.backgroundColor(parseArgb(assign[1].expectString())); break;
                 case "borderColor":
-                    builder.borderColor(parseArgb(assign[1].expectString()));
-                    break;
+                    builder.borderColor(parseArgb(assign[1].expectString())); break;
                 case "hidden":
-                    builder.hidden(assign[1].expectBoolean());
-                    break;
+                    builder.hidden(assign[1].expectBoolean()); break;
                 case "showLootbeam":
-                    builder.showLootbeam(assign[1].expectBoolean());
-                    break;
+                    builder.showLootbeam(assign[1].expectBoolean()); break;
                 case "showValue":
-                    builder.showValue(assign[1].expectBoolean());
-                    break;
+                    builder.showValue(assign[1].expectBoolean()); break;
                 case "showDespawn":
-                    builder.showDespawn(assign[1].expectBoolean());
-                    break;
+                    builder.showDespawn(assign[1].expectBoolean()); break;
                 default:
                     throw new ParseException("unexpected identifier in display config block", assign[0]);
             }
