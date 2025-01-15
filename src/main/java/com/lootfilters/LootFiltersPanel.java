@@ -21,17 +21,19 @@ import static com.lootfilters.util.FilterUtil.configToFilterSource;
 import static com.lootfilters.util.TextUtil.quote;
 import static java.util.Collections.emptyList;
 import static net.runelite.client.util.ImageUtil.loadImageResource;
+import static net.runelite.client.util.ImageUtil.resizeImage;
 
 public class LootFiltersPanel extends PluginPanel {
     private final LootFiltersPlugin plugin;
+    private final JComboBox<String> filterSelect;
 
     public LootFiltersPanel(LootFiltersPlugin plugin) throws Exception {
         this.plugin = plugin;
+        this.filterSelect = new JComboBox<>();
         render();
     }
 
     private void render() throws Exception {
-        var placeholder = loadImageResource(this.getClass(), "/com/lootfilters/icons/Placeholder.png");
         var main = new JPanel();
 
         main.setLayout(new BoxLayout(main, BoxLayout.Y_AXIS));
@@ -42,10 +44,7 @@ public class LootFiltersPanel extends PluginPanel {
         var label = new JLabel("Active filter:");
         top.add(label);
 
-        var filterSelect = new JComboBox<String>();
-
-        var importClipboard = new JButton("", new ImageIcon(placeholder));
-        importClipboard.addActionListener(it -> {
+        var importClipboard = createIconButton("add_icon", "Import new filter from clipboard.", () -> {
             String source;
             try {
                 source = getClipboard();
@@ -85,10 +84,7 @@ public class LootFiltersPanel extends PluginPanel {
         importClipboard.setToolTipText("Import a new filter from the clipboard.");
         top.add(importClipboard);
 
-        var importConfig = new JButton("", new ImageIcon(placeholder));
-        importConfig.setToolTipText("Import the current general config (highlight, hide, and item value tiers) to a new filter");
-        importConfig.setBorder(null);
-        importConfig.addActionListener(it -> {
+        var importConfig = createIconButton("config_icon", "Import highlight, hide, and item value config settings into a new filter.", () -> {
             var initialName = plugin.getClient().getLocalPlayer() != null
                     ? plugin.getClient().getLocalPlayer().getName() + "/"
                     : "player/";
@@ -109,28 +105,7 @@ public class LootFiltersPanel extends PluginPanel {
         });
         top.add(importConfig);
 
-        var deleteActive = new JButton("", new ImageIcon(placeholder));
-        deleteActive.setToolTipText("Delete the currently active filter.");
-        deleteActive.setBorder(null);
-        deleteActive.addActionListener(it -> {
-            var result = JOptionPane.showConfirmDialog(deleteActive, "Delete the active loot filter?", "Confirm", JOptionPane.YES_NO_OPTION);
-            if (result != JOptionPane.YES_OPTION) {
-                return;
-            }
-
-            var index = filterSelect.getSelectedIndex();
-            if (plugin.getUserFilters().isEmpty() || index == -1) {
-                return;
-            }
-
-            filterSelect.removeItemAt(index);
-            filterSelect.setSelectedIndex(-1);
-
-            var newCfg = new ArrayList<>(plugin.getUserFilters());
-            newCfg.remove(index);
-            plugin.setUserFilters(newCfg);
-            plugin.setUserFilterIndex(-1);
-        });
+        var deleteActive = createIconButton("delete_icon", "Delete the currently active filter.", this::onDeleteActive);
         top.add(deleteActive);
 
         main.add(top);
@@ -178,7 +153,42 @@ public class LootFiltersPanel extends PluginPanel {
         add(main);
     }
 
+    private void onDeleteActive() {
+        var result = JOptionPane.showConfirmDialog(this, "Delete the active loot filter?", "Confirm", JOptionPane.YES_NO_OPTION);
+        if (result != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        var index = filterSelect.getSelectedIndex();
+        if (plugin.getUserFilters().isEmpty() || index == -1) {
+            return;
+        }
+
+        filterSelect.removeItemAt(index);
+        filterSelect.setSelectedIndex(-1);
+
+        var newCfg = new ArrayList<>(plugin.getUserFilters());
+        newCfg.remove(index);
+        plugin.setUserFilters(newCfg);
+        plugin.setUserFilterIndex(-1);
+    }
+
+    private JButton createIconButton(String iconSource, String tooltip, Runnable onClick) {
+        var button = new JButton("", icon(iconSource));
+        button.setToolTipText(tooltip);
+        button.setBackground(null);
+        button.setBorder(null);
+        button.addActionListener(it -> onClick.run());
+        return button;
+    }
+
     public static String getClipboard() throws Exception {
         return (String) Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
+    }
+
+    public static ImageIcon icon(String name) {
+        var img = loadImageResource(LootFiltersPanel.class, "/com/lootfilters/icons/" + name + ".png");
+        img = resizeImage(img, 18, 18);
+        return new ImageIcon(img);
     }
 }
