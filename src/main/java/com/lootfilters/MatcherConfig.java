@@ -3,6 +3,7 @@ package com.lootfilters;
 import com.lootfilters.rule.Comparator;
 import com.lootfilters.rule.ItemValueRule;
 import com.lootfilters.rule.Rule;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import net.runelite.api.TileItem;
@@ -13,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Getter
+@AllArgsConstructor
 @EqualsAndHashCode
 public class MatcherConfig {
     private final Rule rule;
@@ -24,11 +26,6 @@ public class MatcherConfig {
                 .findFirst()
                 .orElse(null);
         return match != null ? match.display : null;
-    }
-
-    public MatcherConfig(Rule rule, DisplayConfig display) {
-        this.rule = rule;
-        this.display = display;
     }
 
     public static MatcherConfig ownershipFilter(boolean enabled) {
