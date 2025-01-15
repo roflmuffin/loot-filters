@@ -1,6 +1,6 @@
 package com.lootfilters.lang;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,10 +10,13 @@ import java.util.function.Consumer;
 /**
  * TokenStream wraps a list of Tokens to expose retrieval APIs suitable for parsing.
  */
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class TokenStream {
     private final List<Token> tokens;
 
+    /**
+     * Peek at the first token in the stream, ignoring whitespace, without consuming it.
+     */
     public Token peek() {
         return tokens.stream()
                 .filter(it -> !it.isWhitespace())
@@ -21,6 +24,9 @@ public class TokenStream {
                 .orElse(null);
     }
 
+    /**
+     * Consume the first token in the stream, optionally including whitespace.
+     */
     public Token take(boolean includeWhitespace) {
         while (isNotEmpty()) {
             var next = tokens.remove(0);
@@ -31,10 +37,17 @@ public class TokenStream {
         return null;
     }
 
+    /**
+     * Consume the first non-whitespace token in the stream.
+     */
     public Token take() {
         return take(false);
     }
 
+    /**
+     * Consume the first token in the stream, optionally including whitespace, while asserting that it is of the given
+     * type.
+     */
     public Token takeExpect(Token.Type expect, boolean includeWhitespace) {
         if (tokens.isEmpty()) {
             throw new ParseException("unexpected end of token stream");
@@ -47,18 +60,17 @@ public class TokenStream {
         return first;
     }
 
+    /**
+     * Consume the first non-whitespace token in the stream while asserting that it is of the given type.
+     */
     public Token takeExpect(Token.Type expect) {
-        if (tokens.isEmpty()) {
-            throw new ParseException("unexpected end of token stream");
-        }
-
-        var first = take(false);
-        if (!first.is(expect)) {
-            throw new ParseException("unexpected non-" + expect + " token", first);
-        }
-        return first;
+        return takeExpect(expect, false);
     }
 
+    /**
+     * Consumes the first non-whitespace token at the head of the stream, asserting that it is any one of the literal
+     * types (int, string, boolean).
+     */
     public Token takeExpectLiteral() {
         var first = take();
         if (!first.is(Token.Type.LITERAL_INT)
@@ -86,83 +98,22 @@ public class TokenStream {
         return line;
     }
 
+    /**
+     * Consumes a token of the expected type if it's at the head of the stream, doing nothing otherwise.
+     */
     public void takeOptional(Token.Type type) {
         if (peek().is(type)) {
             take();
         }
     }
 
-    public TokenStream takeBlock() {
-        var tokens = new ArrayList<Token>();
-        var state = new Stack<Token>();
-        if (!peek().is(Token.Type.BLOCK_START)) {
-            throw new ParseException("unexpected token", peek());
-        }
-
-        while (isNotEmpty()) {
-            var next = take();
-            if (next.is(Token.Type.BLOCK_START)) {
-                state.push(next);
-                if (!tokens.isEmpty()) { // inner block start, preserve it
-                    tokens.add(next);
-                }
-            } else if (next.is(Token.Type.BLOCK_END)) {
-                if (!state.isEmpty()) {
-                    state.pop();
-                    if (!state.isEmpty()) { // STILL not empty = inner block end, preserve it
-                        tokens.add(next);
-                    }
-                } else {
-                    throw new ParseException("unbalanced block: more { than }");
-                }
-            } else {
-                tokens.add(next);
-            }
-
-            if (state.isEmpty()) { // end of original block
-                return new TokenStream(tokens);
-            }
-        }
-        if (!state.isEmpty()) {
-            throw new ParseException("unbalanced block: more { than }");
-        }
-
-        return new TokenStream(tokens);
-    }
-
-    // TODO: replace usage w/ walkExpression(EXPR_START, EXPR_END, ...)
-    public void walkExpression(Consumer<Token> consumer) throws ParseException {
-        var state = new Stack<Token>();
-        if (!peek().is(Token.Type.EXPR_START)) {
-            throw new ParseException("unexpected start of expression", peek());
-        }
-
-        while (isNotEmpty()) {
-            var next = take();
-            if (next.is(Token.Type.EXPR_START)) {
-                state.push(next);
-            } else if (next.is(Token.Type.EXPR_END)) {
-                if (!state.isEmpty()) {
-                    state.pop();
-                } else {
-                    throw new ParseException("unbalanced expression: more ) than (");
-                }
-            }
-
-            consumer.accept(next);
-            if (state.isEmpty()) { // balanced expression
-                return;
-            }
-        }
-        if (!state.isEmpty()) {
-            throw new ParseException("unbalanced expression: more ( than )");
-        }
-    }
-
     /**
-     * Traverse an expression within the stream.
+     * Traverse an expression enclosed by the given start and end tokens at the head of the stream.
      * The traversal will verify that the expression in the stream is balanced. The caller can and most likely will
      * still maintain their own operator stack, but it won't require balance checks.
+     * Callers MAY consume any number of tokens from the front of the stream, as long as they do not remove enclosing
+     * tokens in a manner that would disrupt the balance check.
+     * The consumer will be invoked with both the starting and ending enclosing tokens.
      */
     public void walkExpression(Token.Type start, Token.Type end, Consumer<Token> consumer) {
         var state = new Stack<Token>();
@@ -192,6 +143,10 @@ public class TokenStream {
         }
     }
 
+    /**
+     * Take an entire expression denoted by start and end tokens from the head of the stream, optionally including those
+     * enclosing tokens.
+     */
     public TokenStream take(Token.Type start, Token.Type end, boolean preserveEnclosing) {
         var inner = new ArrayList<Token>();
         walkExpression(start, end, inner::add);
@@ -202,10 +157,17 @@ public class TokenStream {
         return new TokenStream(inner);
     }
 
+    /**
+     * Take an entire expression denoted by start and end tokens from the head of the stream, IGNORING those enclosing
+     * tokens.
+     */
     public TokenStream take(Token.Type start, Token.Type end) {
         return take(start, end, false);
     }
 
+    /**
+     * Consumes all remaining tokens in the stream.
+     */
     public List<Token> all() {
         var ret = new ArrayList<Token>();
         while (isNotEmpty()) {
@@ -214,6 +176,9 @@ public class TokenStream {
         return ret;
     }
 
+    /**
+     * Consumes an argument list at the head of the stream matching the grammar ( expr0, expr1, <...> exprN [,] ).
+     */
     public List<TokenStream> takeArgList() {
         var args = new ArrayList<TokenStream>();
         var current = new ArrayList<Token>();

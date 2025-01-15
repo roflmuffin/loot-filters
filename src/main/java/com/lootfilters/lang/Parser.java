@@ -64,7 +64,7 @@ public class Parser {
     }
 
     private void parseMeta() {
-        var block = tokens.takeBlock();
+        var block = tokens.take(BLOCK_START, BLOCK_END);
         while (block.isNotEmpty()) {
             var tok = block.takeExpect(IDENTIFIER);
             block.takeExpect(ASSIGN);
@@ -99,7 +99,7 @@ public class Parser {
     private void parseMatcher() {
         var operators = new Stack<Token>();
         var rulesPostfix = new ArrayList<Rule>();
-        tokens.walkExpression(it -> {
+        tokens.walkExpression(EXPR_START, EXPR_END, it -> {
             if (it.is(EXPR_START)) {
                 operators.push(it);
             } else if (it.is(EXPR_END)) {
