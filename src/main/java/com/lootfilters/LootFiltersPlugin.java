@@ -5,6 +5,7 @@ import com.google.gson.reflect.TypeToken;
 import com.google.inject.Provides;
 import com.lootfilters.util.RuneliteUtil;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
@@ -19,6 +20,7 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.game.ItemManager;
+import net.runelite.client.input.MouseManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.ClientToolbar;
@@ -53,9 +55,13 @@ public class LootFiltersPlugin extends Plugin {
 	@Inject private Client client;
 	@Inject private ClientToolbar clientToolbar;
 	@Inject private ClientThread clientThread;
+
 	@Inject private LootFiltersConfig config;
 	@Inject private LootFiltersOverlay overlay;
+	@Inject private LootFiltersMouseAdapter mouseAdapter;
+
 	@Inject private OverlayManager overlayManager;
+	@Inject private MouseManager mouseManager;
 	@Inject private ConfigManager configManager;
 	@Inject private ItemManager itemManager;
 
@@ -69,6 +75,8 @@ public class LootFiltersPlugin extends Plugin {
 	private LootFilter currentAreaFilter;
 
 	private List<LootFilter> parsedUserFilters;
+
+	@Setter private int hoveredItem = -1;
 
 	public LootFilter getActiveFilter() {
 		return currentAreaFilter != null ? currentAreaFilter : activeFilter;
@@ -120,6 +128,10 @@ public class LootFiltersPlugin extends Plugin {
 		});
 	}
 
+	public String getItemName(int id) {
+		return itemManager.getItemComposition(id).getName();
+	}
+
 	@Override
 	protected void startUp() throws Exception {
 		overlayManager.add(overlay);
@@ -134,6 +146,7 @@ public class LootFiltersPlugin extends Plugin {
 				.panel(pluginPanel)
 				.build();
 		clientToolbar.addNavigation(pluginPanelNav);
+		mouseManager.registerMouseListener(mouseAdapter);
 	}
 
 	@Override
@@ -144,6 +157,7 @@ public class LootFiltersPlugin extends Plugin {
 		lootbeamIndex.clear();
 
 		clientToolbar.removeNavigation(pluginPanelNav);
+		mouseManager.unregisterMouseListener(mouseAdapter);
 	}
 
 	@Provides

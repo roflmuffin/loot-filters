@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 
 import static com.lootfilters.util.TextUtil.quote;
 import static java.lang.String.format;
-import static java.lang.String.join;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
 import static net.runelite.client.util.ColorUtil.colorToAlphaHexCode;
@@ -68,7 +67,7 @@ public class FilterUtil {
                 .map(it -> "HIDE("+ quote(it) + ")")
                 .collect(joining("\n"));
 
-        return join("\n",
+        return String.join("\n",
                 defines,
                 meta,
                 highlights,

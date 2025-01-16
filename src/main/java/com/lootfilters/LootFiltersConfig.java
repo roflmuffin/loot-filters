@@ -87,6 +87,11 @@ public interface LootFiltersConfig extends Config {
             position = 1
     )
     default String hiddenItems() { return ""; }
+    @ConfigItem(keyName = "highlightedItems", name = "", description = "")
+    void setHighlightedItems(String key);
+    @ConfigItem(keyName = "hiddenItems", name = "", description = "")
+    void setHiddenItems(String key);
+
     @ConfigItem(
             keyName = "highlightColor",
             name = "Highlight color",
@@ -95,6 +100,14 @@ public interface LootFiltersConfig extends Config {
             position = 2
     )
     default Color highlightColor() { return Color.decode("#aa00ff"); }
+    @ConfigItem(
+            keyName = "highlightLootbeam",
+            name = "Highlight lootbeam",
+            description = "Configures whether highlighted items show a lootbeam.",
+            section = itemLists,
+            position = 3
+    )
+    default boolean highlightLootbeam() { return false; }
 
     @ConfigSection(
             name = "Item value rules",

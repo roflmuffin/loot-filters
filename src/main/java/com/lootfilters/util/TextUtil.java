@@ -2,6 +2,9 @@ package com.lootfilters.util;
 
 import java.awt.Color;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class TextUtil {
     private TextUtil() {}
@@ -60,5 +63,23 @@ public class TextUtil {
             assert r != null;
             return normalizeCrlf(new String(r.readAllBytes()));
         }
+    }
+
+    public static String setCsv(String csv, String value) {
+        if (csv.isBlank()) {
+            return value;
+        }
+        return Stream.concat(Arrays.stream(csv.split(",")), Stream.of(value))
+                .distinct()
+                .collect(Collectors.joining(","));
+    }
+
+    public static String unsetCsv(String csv, String value) {
+        if (csv.isBlank()) {
+            return value;
+        }
+        return Arrays.stream(csv.split(","))
+                .filter(it -> !it.equals(value))
+                .collect(Collectors.joining(","));
     }
 }

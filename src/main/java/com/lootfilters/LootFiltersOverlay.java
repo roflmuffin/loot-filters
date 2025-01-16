@@ -1,6 +1,7 @@
 package com.lootfilters;
 
 import net.runelite.api.Client;
+import net.runelite.api.KeyCode;
 import net.runelite.api.TileItem;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.client.game.ItemManager;
@@ -13,9 +14,11 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.util.stream.Collectors;
+import java.awt.Rectangle;
 
 import static com.lootfilters.util.TextUtil.getValueText;
+import static java.util.stream.Collectors.counting;
+import static java.util.stream.Collectors.groupingBy;
 import static net.runelite.api.Perspective.getCanvasTextLocation;
 import static net.runelite.client.ui.FontManager.getRunescapeSmallFont;
 
@@ -41,10 +44,13 @@ public class LootFiltersOverlay extends Overlay {
     @Override
     public Dimension render(Graphics2D g) {
         var activeFilter = plugin.getActiveFilter();
+        var mouse = client.getMouseCanvasPosition();
+        var hoveredItem = -1;
+
         for (var entry : plugin.getTileItemIndex().entrySet()) {
             var items = entry.getValue();
             var itemCounts = items.stream()
-                    .collect(Collectors.groupingBy(TileItem::getId, Collectors.counting()));
+                    .collect(groupingBy(TileItem::getId, counting()));
 
             var tile = entry.getKey();
             var currentOffset = 0;
@@ -59,16 +65,15 @@ public class LootFiltersOverlay extends Overlay {
                     continue;
                 }
 
-                var displayText = buildDisplayText(item, count, match);
-
                 var loc = LocalPoint.fromWorld(client.getTopLevelWorldView(), tile.getWorldLocation());
                 if (loc == null) {
                     continue;
                 }
-
                 if (tile.getItemLayer() == null) {
                     continue;
                 }
+
+                var displayText = buildDisplayText(item, count, match);
                 var textPoint = getCanvasTextLocation(client, g, loc, displayText, tile.getItemLayer().getHeight() + Z_STACK_OFFSET);
                 if (textPoint == null) {
                     continue;
@@ -84,23 +89,24 @@ public class LootFiltersOverlay extends Overlay {
                 text.setColor(match.getTextColor());
                 text.setPosition(new Point(textPoint.getX(), textPoint.getY() - currentOffset));
 
+                var boundingBox = new Rectangle(
+                        textPoint.getX() - BOX_PAD, textPoint.getY() - currentOffset - textHeight - BOX_PAD,
+                        textWidth + 2 * BOX_PAD, textHeight + 2 * BOX_PAD
+                );
+
                 if (match.getBackgroundColor() != null) {
                     g.setColor(match.getBackgroundColor());
-                    g.fillRect(
-                            textPoint.getX() - BOX_PAD,
-                            textPoint.getY() - currentOffset - textHeight - BOX_PAD,
-                            textWidth + 2*BOX_PAD,
-                            textHeight + 2*BOX_PAD
-                    );
+                    g.fillRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
                 }
                 if (match.getBorderColor() != null) {
                     g.setColor(match.getBorderColor());
-                    g.drawRect(
-                            textPoint.getX() - BOX_PAD,
-                            textPoint.getY() - currentOffset - textHeight - BOX_PAD,
-                            textWidth + 2*BOX_PAD,
-                            textHeight + 2*BOX_PAD
-                    );
+                    g.drawRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
+                }
+                if (plugin.getClient().isKeyPressed(KeyCode.KC_ALT) && boundingBox.contains(mouse.getX(), mouse.getY())) {
+                    hoveredItem = item.getId();
+
+                    g.setColor(Color.WHITE);
+                    g.drawRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
                 }
 
                 text.render(g);
@@ -119,6 +125,8 @@ public class LootFiltersOverlay extends Overlay {
                 currentOffset += Z_STACK_OFFSET;
             }
         }
+
+        plugin.setHoveredItem(hoveredItem);
         return null;
     }
 
