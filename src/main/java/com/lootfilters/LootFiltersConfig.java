@@ -28,11 +28,11 @@ public interface LootFiltersConfig extends Config {
     @ConfigItem(
             keyName = "showUnmatchedItems",
             name = "Show unmatched items",
-            description = "By default, items that do not match a filter rule will not get a text overlay. Enable this to instead show the overlay as a fallback when an item doesn't match a filter rule.",
+            description = "Give a default text overlay to items that don't match the active filter.",
             section = general,
             position = 1
     )
-    default boolean showUnmatchedItems() { return false; }
+    default boolean showUnmatchedItems() { return true; }
     @ConfigItem(
             keyName = "ownershipFilter",
             name = "Ownership filter",

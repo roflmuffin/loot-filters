@@ -44,4 +44,18 @@ public class LootbeamIndex {
         }
         index.clear();
     }
+
+    public void reset(LootFiltersPlugin plugin) {
+        clear();
+        for (var entry : plugin.getTileItemIndex().entrySet()) {
+            var tile = entry.getKey();
+            for (var item : entry.getValue()) {
+                var match = plugin.getActiveFilter().findMatch(plugin, item);
+                if (match != null && match.isShowLootbeam()) {
+                    put(tile, item, new Lootbeam(plugin.getClient(), plugin.getClientThread(), tile.getWorldLocation(),
+                            match.getTextColor(), Lootbeam.Style.MODERN));
+                }
+            }
+        }
+    }
 }

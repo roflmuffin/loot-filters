@@ -175,6 +175,7 @@ public class LootFiltersPlugin extends Plugin {
 		if (!config.autoToggleFilters()) {
 			currentAreaFilter = null;
 		} // if we're transitioning TO enabled, do nothing - onGameTick() will handle it
+		clientThread.invoke(() -> lootbeamIndex.reset(this));
 	}
 
 	@Subscribe

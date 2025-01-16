@@ -19,6 +19,3 @@ The base configuration is largely mirrored from that of the ground items builtin
 The primary addition of this plugin is support for scriptable filters.
 
 syntax description todo
-
-## todo
-* fix: reflow lootbeam display on filter config update
