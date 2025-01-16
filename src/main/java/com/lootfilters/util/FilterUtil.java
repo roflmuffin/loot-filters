@@ -26,7 +26,7 @@ public class FilterUtil {
 
         matchersWithConfig.addAll(filter.getMatchers());
 
-        matchersWithConfig.add(MatcherConfig.highlight(config.highlightedItems(), config.highlightColor()));
+        matchersWithConfig.add(MatcherConfig.highlight(config.highlightedItems(), config.highlightColor(), config.highlightLootbeam()));
         matchersWithConfig.add(MatcherConfig.hide(config.hiddenItems()));
 
         matchersWithConfig.add(MatcherConfig.valueTier(config.enableInsaneItemValueTier(), config.insaneValue(), config.insaneValueColor(), true));

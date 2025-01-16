@@ -1,7 +1,9 @@
 package com.lootfilters;
 
 import com.lootfilters.rule.Comparator;
+import com.lootfilters.rule.ItemNameRule;
 import com.lootfilters.rule.ItemValueRule;
+import com.lootfilters.rule.OrRule;
 import com.lootfilters.rule.Rule;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -12,6 +14,7 @@ import net.runelite.api.Varbits;
 import java.awt.Color;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @AllArgsConstructor
@@ -68,28 +71,25 @@ public class MatcherConfig {
         return new MatcherConfig(rule, display);
     }
 
-    public static MatcherConfig highlight(String rawNames, Color color) {
-        var names = rawNames.split(",");
-        var rule = new Rule("") {
-            @Override public boolean test(LootFiltersPlugin plugin, TileItem item) {
-                var name = plugin.getItemManager().getItemComposition(item.getId()).getName();
-                return Arrays.stream(names).anyMatch(it -> it.equalsIgnoreCase(name));
-            }
-        };
+    public static MatcherConfig highlight(String rawNames, Color color, boolean showLootbeam) {
+        var rule = new OrRule(
+                Arrays.stream(rawNames.split(","))
+                        .map(ItemNameRule::new)
+                        .collect(Collectors.toList())
+        );
         var display = DisplayConfig.builder()
                 .textColor(color)
+                .showLootbeam(showLootbeam)
                 .build();
         return new MatcherConfig(rule, display);
     }
 
     public static MatcherConfig hide(String rawNames) {
-        var names = rawNames.split(",");
-        var rule = new Rule("") {
-            @Override public boolean test(LootFiltersPlugin plugin, TileItem item) {
-                var name = plugin.getItemManager().getItemComposition(item.getId()).getName();
-                return Arrays.stream(names).anyMatch(it -> it.equalsIgnoreCase(name));
-            }
-        };
+        var rule = new OrRule(
+                Arrays.stream(rawNames.split(","))
+                        .map(ItemNameRule::new)
+                        .collect(Collectors.toList())
+        );
         var display = DisplayConfig.builder()
                 .hidden(true)
                 .build();
