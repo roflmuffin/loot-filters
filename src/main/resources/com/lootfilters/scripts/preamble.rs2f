@@ -1,2 +1,29 @@
+#define RED "ffff0000"
+#define GREEN "ff00ff00"
+#define BLUE "ff0000ff"
+#define CYAN "ff00ffff"
+#define MAGENTA "ffff00ff"
+#define YELLOW "ffffff00"
+#define WHITE "ffffffff"
+#define BLACK "ff000000"
+
+#define BRONZE "5b462a"
+#define BLURITE "8f90d8"
+#define IRON "635c5b"
+#define ELEMENTAL "70119f"
+#define SILVER "a8a8b4"
+#define STEEL "908686"
+#define GOLD "d8b01a"
+#define LOVAKITE "641509"
+#define MITHRIL "4c4c70"
+#define LUNAR "727b72"
+#define ADAMANT "506450"
+#define RUNITE "516d78"
+
+#define GROUNDITEMS_INSANE "ffff66b2"
+#define GROUNDITEMS_HIGH "ffff9600"
+#define GROUNDITEMS_MEDIUM "ff99ff99"
+#define GROUNDITEMS_LOW "ff66b2ff"
+
 #define HIGHLIGHT(_name, _color) if (name:_name) { color = _color; }
 #define HIDE(_name) if (name:_name) { hidden = true; }
