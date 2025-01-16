@@ -130,7 +130,7 @@ public class LootFiltersPlugin extends Plugin {
 		pluginPanel = new LootFiltersPanel(this);
 		pluginPanelNav = NavigationButton.builder()
 				.tooltip("Loot filters")
-				.icon(loadImageResource(this.getClass(), "/com/lootfilters/icons/Placeholder.png"))
+				.icon(loadImageResource(this.getClass(), "/com/lootfilters/icons/panel_icon.png"))
 				.panel(pluginPanel)
 				.build();
 		clientToolbar.addNavigation(pluginPanelNav);
