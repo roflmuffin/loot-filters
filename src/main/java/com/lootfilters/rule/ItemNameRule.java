@@ -15,6 +15,6 @@ public class ItemNameRule extends Rule {
 
     @Override
     public boolean test(LootFiltersPlugin plugin, TileItem item) {
-        return plugin.getItemManager().getItemComposition(item.getId()).getName().equals(name);
+        return plugin.getItemManager().getItemComposition(item.getId()).getName().equalsIgnoreCase(name);
     }
 }
