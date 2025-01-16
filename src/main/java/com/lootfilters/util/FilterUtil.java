@@ -37,14 +37,14 @@ public class FilterUtil {
         matchersWithConfig.add(MatcherConfig.showUnmatched(config.showUnmatchedItems()));
 
         if (config.alwaysShowValue()) {
-            matchersWithConfig = filter.getMatchers().stream()
+            matchersWithConfig = matchersWithConfig.stream()
                     .map(it -> new MatcherConfig(it.getRule(), it.getDisplay().toBuilder()
                             .showValue(true)
                             .build()))
                     .collect(Collectors.toCollection(ArrayList::new));
         }
         if (config.alwaysShowDespawn()) {
-            matchersWithConfig = filter.getMatchers().stream()
+            matchersWithConfig = matchersWithConfig.stream()
                     .map(it -> new MatcherConfig(it.getRule(), it.getDisplay().toBuilder()
                             .showDespawn(true)
                             .build()))
