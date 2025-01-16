@@ -114,7 +114,7 @@ public class LootFiltersPlugin extends Plugin {
 				? "" : filters.get(index);
 	}
 
-	public void addPluginChatMessage(String msg) {
+	public void addChatMessage(String msg) {
 		clientThread.invoke(() -> {
 			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", msg, "loot-filters", false);
 		});
@@ -255,10 +255,10 @@ public class LootFiltersPlugin extends Plugin {
 				.filter(it -> it.isInActivationArea(p))
 				.findFirst().orElse(null);
 		if (match != null && (currentAreaFilter == null || !Objects.equals(match.getName(), currentAreaFilter.getName()))) {
-			addPluginChatMessage("Entering area for filter " + quote(match.getName()));
+			addChatMessage("Entering area for filter " + quote(match.getName()));
 			currentAreaFilter = withConfigMatchers(match, config);
 		} else if (match == null && currentAreaFilter != null) {
-			addPluginChatMessage("Leaving area for filter " + quote(currentAreaFilter.getName()));
+			addChatMessage("Leaving area for filter " + quote(currentAreaFilter.getName()));
 			currentAreaFilter = null;
 		}
 	}

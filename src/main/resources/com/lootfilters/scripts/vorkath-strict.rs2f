@@ -62,3 +62,4 @@ if (name:"Skeletal visage") {
 }
 
 if (name:"Superior dragon bones") { hidden = true; }
+HIGHLIGHT("Seaweed", "ff00ff00")
