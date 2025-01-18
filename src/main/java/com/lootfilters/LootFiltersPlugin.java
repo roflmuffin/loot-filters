@@ -3,18 +3,17 @@ package com.lootfilters;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.inject.Provides;
-import com.lootfilters.util.RuneliteUtil;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
-import net.runelite.api.MenuEntry;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.ClientTick;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemDespawned;
 import net.runelite.api.events.ItemSpawned;
+import net.runelite.api.events.MenuEntryAdded;
+import net.runelite.api.events.MenuOpened;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
@@ -29,17 +28,12 @@ import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.lootfilters.util.FilterUtil.withConfigMatchers;
-import static com.lootfilters.util.RuneliteUtil.isGroundItem;
 import static com.lootfilters.util.TextUtil.quote;
 import static java.util.Collections.emptyList;
-import static net.runelite.client.util.ColorUtil.colorTag;
 import static net.runelite.client.util.ImageUtil.loadImageResource;
 
 @Slf4j
@@ -70,10 +64,10 @@ public class LootFiltersPlugin extends Plugin {
 
 	private final TileItemIndex tileItemIndex = new TileItemIndex();
 	private final LootbeamIndex lootbeamIndex = new LootbeamIndex();
+	private final MenuEntryComposer menuEntryComposer = new MenuEntryComposer(this);
 
 	private LootFilter activeFilter;
 	private LootFilter currentAreaFilter;
-
 	private List<LootFilter> parsedUserFilters;
 
 	@Setter private int hoveredItem = -1;
@@ -208,46 +202,13 @@ public class LootFiltersPlugin extends Plugin {
 	}
 
 	@Subscribe
-	public void onClientTick(ClientTick event) {
-		var entries = client.getMenu().getMenuEntries();
-		var wv = client.getTopLevelWorldView();
-		var seen = new HashMap<MenuEntry, Boolean>();
-		var itemCounts = Stream.of(entries)
-				.filter(RuneliteUtil::isGroundItem)
-				.collect(Collectors.groupingBy(it -> it, Collectors.counting()));
+	private void onMenuEntryAdded(MenuEntryAdded event) {
+		menuEntryComposer.onMenuEntryAdded(event.getMenuEntry());
+	}
 
-		var newEntries = new ArrayList<MenuEntry>();
-		for (var entry : entries) {
-			if (seen.containsKey(entry)) {
-				continue;
-			}
-			if (!isGroundItem(entry)) {
-				newEntries.add(entry);
-				continue;
-			}
-
-			seen.put(entry, true);
-			newEntries.add(entry);
-		}
-		for (var entry : newEntries) {
-			if (!isGroundItem(entry)) {
-				continue;
-			}
-
-			var point = WorldPoint.fromScene(wv, entry.getParam0(), entry.getParam1(), wv.getPlane());
-			var item = tileItemIndex.findItem(point, entry.getIdentifier());
-			var match = getActiveFilter().findMatch(this, item);
-			if (match != null && !match.isHidden()) {
-				if (itemCounts.get(entry) > 1) {
-					entry.setTarget(colorTag(match.getTextColor()) + itemManager.getItemComposition(item.getId()).getName() + " x" + itemCounts.get(entry));
-				} else if (!entry.getTarget().startsWith(colorTag(match.getTextColor()))) { // shitty idempotency
-					entry.setTarget(colorTag(match.getTextColor()) + itemManager.getItemComposition(item.getId()).getName());
-				}
-			} else {
-				entry.setDeprioritized(true);
-			}
-		}
-		client.getMenu().setMenuEntries(newEntries.toArray(MenuEntry[]::new));
+	@Subscribe
+	public void onMenuOpened(MenuOpened event) {
+		menuEntryComposer.onMenuOpened();
 	}
 
 	private void loadFilter() throws Exception {
