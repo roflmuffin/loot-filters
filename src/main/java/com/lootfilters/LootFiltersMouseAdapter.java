@@ -9,6 +9,7 @@ import java.awt.event.MouseEvent;
 import static com.lootfilters.util.TextUtil.setCsv;
 import static com.lootfilters.util.TextUtil.unsetCsv;
 import static javax.swing.SwingUtilities.isLeftMouseButton;
+import static javax.swing.SwingUtilities.isMiddleMouseButton;
 import static javax.swing.SwingUtilities.isRightMouseButton;
 
 public class LootFiltersMouseAdapter extends MouseAdapter {
@@ -35,6 +36,13 @@ public class LootFiltersMouseAdapter extends MouseAdapter {
                 var item = plugin.getItemName(hover).toLowerCase();
                 plugin.getConfig().setHighlightedItems(unsetCsv(highlights, item));
                 plugin.getConfig().setHiddenItems(setCsv(hides, item));
+            });
+            e.consume();
+        } else if (isMiddleMouseButton(e)) {
+            plugin.getClientThread().invoke(() -> {
+                var item = plugin.getItemName(hover).toLowerCase();
+                plugin.getConfig().setHighlightedItems(unsetCsv(highlights, item));
+                plugin.getConfig().setHiddenItems(unsetCsv(hides, item));
             });
             e.consume();
         }

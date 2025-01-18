@@ -76,7 +76,7 @@ public class TextUtil {
 
     public static String unsetCsv(String csv, String value) {
         if (csv.isBlank()) {
-            return value;
+            return "";
         }
         return Arrays.stream(csv.split(","))
                 .filter(it -> !it.equals(value))

@@ -25,6 +25,7 @@ import static net.runelite.client.ui.FontManager.getRunescapeSmallFont;
 public class LootFiltersOverlay extends Overlay {
     private static final int Z_STACK_OFFSET = 16; // for initial perspective and subsequent vertical stack
     private static final int BOX_PAD = 2;
+    private static final Color COLOR_HIDDEN = Color.GRAY.brighter();
 
     private final Client client;
     private final LootFiltersPlugin plugin;
@@ -61,7 +62,12 @@ public class LootFiltersOverlay extends Overlay {
                         .findFirst().orElseThrow();
 
                 var match = activeFilter.findMatch(plugin, item);
-                if (match == null || match.isHidden()) {
+                if (match == null) {
+                    continue;
+                }
+
+                var overrideHidden = plugin.getClient().isKeyPressed(KeyCode.KC_ALT) && plugin.getConfig().altShowsHiddenItems();
+                if (match.isHidden() && !overrideHidden) {
                     continue;
                 }
 
@@ -86,7 +92,7 @@ public class LootFiltersOverlay extends Overlay {
                 var text = new TextComponent();
                 text.setText(displayText);
                 text.setFont(getRunescapeSmallFont());
-                text.setColor(match.getTextColor());
+                text.setColor(match.isHidden() ? COLOR_HIDDEN : match.getTextColor());
                 text.setPosition(new Point(textPoint.getX(), textPoint.getY() - currentOffset));
 
                 var boundingBox = new Rectangle(
@@ -105,7 +111,7 @@ public class LootFiltersOverlay extends Overlay {
                 if (plugin.getClient().isKeyPressed(KeyCode.KC_ALT) && boundingBox.contains(mouse.getX(), mouse.getY())) {
                     hoveredItem = item.getId();
 
-                    g.setColor(Color.WHITE);
+                    g.setColor(match.isHidden() ? COLOR_HIDDEN : Color.WHITE);
                     g.drawRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
                 }
 

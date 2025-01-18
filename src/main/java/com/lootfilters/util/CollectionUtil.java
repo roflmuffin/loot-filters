@@ -12,4 +12,10 @@ public class CollectionUtil {
         newList.addAll(Arrays.asList(elements));
         return newList;
     }
+
+    public static <E> List<E> without(List<E> list, E element) {
+        var newList = new ArrayList<>(list);
+        newList.remove(element);
+        return newList;
+    }
 }

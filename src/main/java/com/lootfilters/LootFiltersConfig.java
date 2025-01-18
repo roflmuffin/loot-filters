@@ -34,11 +34,19 @@ public interface LootFiltersConfig extends Config {
     )
     default boolean showUnmatchedItems() { return true; }
     @ConfigItem(
+            keyName = "altShowsHiddenItems",
+            name = "ALT shows hidden items",
+            description = "Show hidden items when ALT is pressed.",
+            section = general,
+            position = 2
+    )
+    default boolean altShowsHiddenItems() { return false; }
+    @ConfigItem(
             keyName = "ownershipFilter",
             name = "Ownership filter",
             description = "When enabled, filters out any items you cannot pick up. This filter is ABSOLUTE, and overrides ALL other rules, including default highlight/hide, default item value rules, and the active loot filter.",
             section = general,
-            position = 2
+            position = 3
     )
     default boolean ownershipFilter() { return false; }
 
