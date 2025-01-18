@@ -63,7 +63,7 @@ public class LootFiltersPlugin extends Plugin {
 	private NavigationButton pluginPanelNav;
 
 	private final TileItemIndex tileItemIndex = new TileItemIndex();
-	private final LootbeamIndex lootbeamIndex = new LootbeamIndex();
+	private final LootbeamIndex lootbeamIndex = new LootbeamIndex(this);
 	private final MenuEntryComposer menuEntryComposer = new MenuEntryComposer(this);
 
 	private LootFilter activeFilter;
@@ -169,7 +169,7 @@ public class LootFiltersPlugin extends Plugin {
 		if (!config.autoToggleFilters()) {
 			currentAreaFilter = null;
 		} // if we're transitioning TO enabled, do nothing - onGameTick() will handle it
-		clientThread.invoke(() -> lootbeamIndex.reset(this));
+		clientThread.invoke(lootbeamIndex::reset);
 	}
 
 	@Subscribe

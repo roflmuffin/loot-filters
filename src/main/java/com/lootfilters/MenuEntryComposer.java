@@ -17,7 +17,7 @@ import static net.runelite.client.util.ColorUtil.colorTag;
 public class MenuEntryComposer {
     private final LootFiltersPlugin plugin;
 
-    public void onMenuEntryAdded(MenuEntry entry) {
+    public void onMenuEntryAdded(MenuEntry entry) { // recolor/add quantity
         if (!isGroundItem(entry)) {
             return;
         }
@@ -32,7 +32,7 @@ public class MenuEntryComposer {
         entry.setTarget(buildTargetText(item, match));
     }
 
-    public void onMenuOpened() {
+    public void onMenuOpened() { // collapse
         var menu = plugin.getClient().getMenu();
         var entries = menu.getMenuEntries();
 
