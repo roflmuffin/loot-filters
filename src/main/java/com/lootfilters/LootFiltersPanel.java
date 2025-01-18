@@ -88,6 +88,7 @@ public class LootFiltersPanel extends PluginPanel {
     private void onImportClipboard() {
         var newSrc = getClipboard();
         if (newSrc == null) {
+            plugin.addChatMessage("No text in clipboard.");
             return;
         }
 
