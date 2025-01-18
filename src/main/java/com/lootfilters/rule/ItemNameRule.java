@@ -15,6 +15,12 @@ public class ItemNameRule extends Rule {
 
     @Override
     public boolean test(LootFiltersPlugin plugin, TileItem item) {
-        return plugin.getItemManager().getItemComposition(item.getId()).getName().equalsIgnoreCase(name);
+        var itemName = plugin.getItemName(item.getId());
+        if (itemName.startsWith("*")) {
+            return itemName.toLowerCase().endsWith(name.toLowerCase());
+        } else if (itemName.endsWith("*")) {
+            return itemName.toLowerCase().startsWith(name.toLowerCase());
+        }
+        return itemName.equalsIgnoreCase(name);
     }
 }
