@@ -24,7 +24,6 @@ import static java.util.Collections.emptyList;
 import static javax.swing.JOptionPane.showConfirmDialog;
 import static javax.swing.JOptionPane.showInputDialog;
 import static net.runelite.client.util.ImageUtil.loadImageResource;
-import static net.runelite.client.util.ImageUtil.resizeImage;
 
 public class LootFiltersPanel extends PluginPanel {
     private final LootFiltersPlugin plugin;
@@ -47,13 +46,13 @@ public class LootFiltersPanel extends PluginPanel {
         var bottom = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         var label = new JLabel("Active filter:");
-        var importClipboard = createIconButton("add_icon",
+        var importClipboard = createIconButton("import_clipboard",
                 "Import new filter from clipboard.",
                 this::onImportClipboard);
-        var importConfig = createIconButton("config_icon_2",
+        var importConfig = createIconButton("import_config",
                 "Import highlight, hide, and item value config settings into a new filter.",
                 this::onImportConfig);
-        var deleteActive = createIconButton("delete_icon",
+        var deleteActive = createIconButton("delete_active",
                 "Delete the currently active filter.",
                 this::onDeleteActive);
         var deleteAll = new JButton("Delete all");
@@ -204,7 +203,6 @@ public class LootFiltersPanel extends PluginPanel {
 
     private static ImageIcon icon(String name) {
         var img = loadImageResource(LootFiltersPanel.class, "/com/lootfilters/icons/" + name + ".png");
-        img = resizeImage(img, 18, 18);
         return new ImageIcon(img);
     }
 }
