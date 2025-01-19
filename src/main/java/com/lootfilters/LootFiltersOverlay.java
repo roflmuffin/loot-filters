@@ -159,8 +159,16 @@ public class LootFiltersOverlay extends Overlay {
         }
 
         if (display.isShowValue()) {
-            var value = itemManager.getItemPrice(item.getId()) * item.getQuantity();
-            text += " (" + getValueText(value) + ")";
+            var ge = itemManager.getItemPrice(item.getId());
+            var ha = itemManager.getItemComposition(item.getId()).getHaPrice();
+            var value = Math.max(ge, ha) * item.getQuantity();
+            if (value > 0) {
+                text += " (";
+                if (ha > ge) {
+                    text += "*";
+                }
+                text += getValueText(value) + ")";
+            }
         }
 
         return text;

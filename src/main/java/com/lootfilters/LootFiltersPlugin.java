@@ -8,6 +8,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
+import net.runelite.api.TileItem;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemDespawned;
@@ -129,6 +130,12 @@ public class LootFiltersPlugin extends Plugin {
 
 	public String getItemName(int id) {
 		return itemManager.getItemComposition(id).getName();
+	}
+
+	public int getHighestItemValue(TileItem item) {
+		var ge = getItemManager().getItemPrice(item.getId());
+		var ha = getItemManager().getItemComposition(item.getId()).getHaPrice();
+		return Math.max(ge, ha);
 	}
 
 	@Override
