@@ -19,7 +19,9 @@ public class ItemValueRule extends ComparatorRule {
             case ItemID.PLATINUM_TOKEN:
                 return item.getQuantity() * 1000;
             default:
-                return plugin.getItemManager().getItemPrice(item.getId()) * item.getQuantity();
+                var ge = plugin.getItemManager().getItemPrice(item.getId());
+                var ha = plugin.getItemManager().getItemComposition(item.getId()).getHaPrice();
+                return Math.max(ge, ha) * item.getQuantity();
         }
     }
 }
