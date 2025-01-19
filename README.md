@@ -10,6 +10,8 @@ plugin.
 This plugin replicates the majority of the experience offered by the base version:
 * Text overlay for ground items
 * Configure display colors based on item value
+* Collapse duplicate right-click menu entries
+* De-prioritize menu entries for hidden items
 * Lootbeams
 * Configure highlighted and hidden item lists in real-time using a configurable hotkey
 
