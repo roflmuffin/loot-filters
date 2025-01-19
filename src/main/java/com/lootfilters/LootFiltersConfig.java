@@ -4,6 +4,8 @@ import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
+import net.runelite.client.config.Keybind;
+import net.runelite.client.config.Units;
 
 import java.awt.Color;
 
@@ -34,26 +36,58 @@ public interface LootFiltersConfig extends Config {
     )
     default boolean showUnmatchedItems() { return true; }
     @ConfigItem(
-            keyName = "altShowsHiddenItems",
-            name = "ALT shows hidden items",
-            description = "Show hidden items when ALT is pressed.",
-            section = general,
-            position = 2
-    )
-    default boolean altShowsHiddenItems() { return false; }
-    @ConfigItem(
             keyName = "ownershipFilter",
             name = "Ownership filter",
             description = "When enabled, filters out any items you cannot pick up. This filter is ABSOLUTE, and overrides ALL other rules, including default highlight/hide, default item value rules, and the active loot filter.",
             section = general,
             position = 3
     )
+
     default boolean ownershipFilter() { return false; }
+    @ConfigSection(
+            name = "Hotkey",
+            description = "Configure hotkey options.",
+            position = 1
+    )
+    String hotkey = "Hotkey";
+    @ConfigItem(
+            keyName = "hotkey",
+            name = "Hotkey",
+            description = "Hotkey used by this plugin.",
+            section = hotkey,
+            position = 0
+    )
+    default Keybind hotkey() { return Keybind.ALT; }
+    @ConfigItem(
+            keyName = "hotkeyShowHiddenItems",
+            name = "Press: Show hidden items",
+            description = "Show hidden items when hotkey is pressed.",
+            section = hotkey,
+            position = 1
+    )
+    default boolean hotkeyShowHiddenItems() { return true; }
+    @ConfigItem(
+            keyName = "hotkeyDoubleTapTogglesOverlay",
+            name = "Double-tap: toggle overlay",
+            description = "When enabled, double-tap the hotkey to toggle the entire ground items overlay.",
+            section = hotkey,
+            position = 2
+    )
+    default boolean hotkeyDoubleTapTogglesOverlay() { return true; }
+    @ConfigItem(
+            keyName = "hotkeyDoubleTapDelay",
+            name = "Double-tap delay",
+            description = "Period within which to register a hotkey double-tap.",
+            section = hotkey,
+            position = 3
+    )
+    @Units(Units.MILLISECONDS)
+    default int hotkeyDoubleTapDelay() { return 250; }
 
     @ConfigSection(
             name = "Display overrides",
             description = "Configure global display overrides.",
-            position = 1
+            position = 2
     )
     String displayOverrides = "displayOverrides";
     @ConfigItem(
@@ -75,8 +109,8 @@ public interface LootFiltersConfig extends Config {
 
     @ConfigSection(
             name = "Item lists",
-            description = "Configure default lists of highlighted and hidden items. Values are case-insensitive, separated by comma.",
-            position = 2
+            description = "Configure default lists of highlighted and hidden items. Values are case-insensitive, separated by comma. These lists are checked AFTER the active filter, but before item value rules.",
+            position = 8
     )
     String itemLists = "itemLists";
     @ConfigItem(
@@ -120,7 +154,7 @@ public interface LootFiltersConfig extends Config {
     @ConfigSection(
             name = "Item value rules",
             description = "Configure default rules for showing based on item value. These rules are checked AFTER both the active filter and the global hide list.",
-            position = 2
+            position = 9
     )
     String itemValueRules = "itemValueRules";
     @ConfigItem(

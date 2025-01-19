@@ -1,0 +1,41 @@
+package com.lootfilters;
+
+import com.google.inject.Inject;
+import net.runelite.client.util.HotkeyListener;
+
+import java.time.Duration;
+import java.time.Instant;
+
+public class LootFiltersHotkeyListener extends HotkeyListener {
+    private final LootFiltersPlugin plugin;
+
+    private Instant lastPressed = Instant.EPOCH;
+
+    @Inject
+    private LootFiltersHotkeyListener(LootFiltersPlugin plugin) {
+        super(plugin.getConfig()::hotkey);
+
+        this.plugin = plugin;
+    }
+
+    @Override
+    public void hotkeyPressed() {
+        plugin.setHotkeyActive(true);
+
+        var now = Instant.now();
+        if (shouldToggleOverlay(now)) {
+            plugin.setOverlayEnabled(!plugin.isOverlayEnabled());
+        }
+        lastPressed = now;
+    }
+
+    @Override
+    public void hotkeyReleased() {
+        plugin.setHotkeyActive(false);
+    }
+
+    private boolean shouldToggleOverlay(Instant now) {
+        return plugin.getConfig().hotkeyDoubleTapTogglesOverlay()
+                && Duration.between(lastPressed, now).toMillis() < plugin.getConfig().hotkeyDoubleTapDelay();
+    }
+}

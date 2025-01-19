@@ -19,6 +19,7 @@ import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.game.ItemManager;
+import net.runelite.client.input.KeyManager;
 import net.runelite.client.input.MouseManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -53,8 +54,10 @@ public class LootFiltersPlugin extends Plugin {
 	@Inject private LootFiltersConfig config;
 	@Inject private LootFiltersOverlay overlay;
 	@Inject private LootFiltersMouseAdapter mouseAdapter;
+	@Inject private LootFiltersHotkeyListener hotkeyListener;
 
 	@Inject private OverlayManager overlayManager;
+	@Inject private KeyManager keyManager;
 	@Inject private MouseManager mouseManager;
 	@Inject private ConfigManager configManager;
 	@Inject private ItemManager itemManager;
@@ -71,6 +74,8 @@ public class LootFiltersPlugin extends Plugin {
 	private List<LootFilter> parsedUserFilters;
 
 	@Setter private int hoveredItem = -1;
+	@Setter private boolean hotkeyActive = false;
+	@Setter private boolean overlayEnabled = true;
 
 	public LootFilter getActiveFilter() {
 		return currentAreaFilter != null ? currentAreaFilter : activeFilter;
@@ -140,6 +145,7 @@ public class LootFiltersPlugin extends Plugin {
 				.panel(pluginPanel)
 				.build();
 		clientToolbar.addNavigation(pluginPanelNav);
+		keyManager.registerKeyListener(hotkeyListener);
 		mouseManager.registerMouseListener(mouseAdapter);
 	}
 
@@ -151,6 +157,7 @@ public class LootFiltersPlugin extends Plugin {
 		lootbeamIndex.clear();
 
 		clientToolbar.removeNavigation(pluginPanelNav);
+		keyManager.unregisterKeyListener(hotkeyListener);
 		mouseManager.unregisterMouseListener(mouseAdapter);
 	}
 

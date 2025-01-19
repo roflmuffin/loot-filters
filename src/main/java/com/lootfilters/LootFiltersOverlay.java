@@ -1,7 +1,6 @@
 package com.lootfilters;
 
 import net.runelite.api.Client;
-import net.runelite.api.KeyCode;
 import net.runelite.api.TileItem;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.client.game.ItemManager;
@@ -44,6 +43,10 @@ public class LootFiltersOverlay extends Overlay {
 
     @Override
     public Dimension render(Graphics2D g) {
+        if (!plugin.isOverlayEnabled()) {
+            return null;
+        }
+
         var activeFilter = plugin.getActiveFilter();
         var mouse = client.getMouseCanvasPosition();
         var hoveredItem = -1;
@@ -66,7 +69,7 @@ public class LootFiltersOverlay extends Overlay {
                     continue;
                 }
 
-                var overrideHidden = plugin.getClient().isKeyPressed(KeyCode.KC_ALT) && plugin.getConfig().altShowsHiddenItems();
+                var overrideHidden = plugin.isHotkeyActive() && plugin.getConfig().hotkeyShowHiddenItems();
                 if (match.isHidden() && !overrideHidden) {
                     continue;
                 }
@@ -108,7 +111,7 @@ public class LootFiltersOverlay extends Overlay {
                     g.setColor(match.getBorderColor());
                     g.drawRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
                 }
-                if (plugin.getClient().isKeyPressed(KeyCode.KC_ALT) && boundingBox.contains(mouse.getX(), mouse.getY())) {
+                if (plugin.isHotkeyActive() && boundingBox.contains(mouse.getX(), mouse.getY())) {
                     hoveredItem = item.getId();
 
                     g.setColor(match.isHidden() ? COLOR_HIDDEN : Color.WHITE);

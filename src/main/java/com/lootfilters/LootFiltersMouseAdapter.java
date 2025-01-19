@@ -1,6 +1,5 @@
 package com.lootfilters;
 
-import net.runelite.api.KeyCode;
 import net.runelite.client.input.MouseAdapter;
 
 import javax.inject.Inject;
@@ -18,7 +17,7 @@ public class LootFiltersMouseAdapter extends MouseAdapter {
     @Override
     public MouseEvent mousePressed(MouseEvent e) {
         var hover = plugin.getHoveredItem();
-        if (hover == -1 || !plugin.getClient().isKeyPressed(KeyCode.KC_ALT)) {
+        if (hover == -1 || !plugin.isHotkeyActive()) {
             return e;
         }
 
