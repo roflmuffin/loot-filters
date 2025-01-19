@@ -1,6 +1,6 @@
 # `riktenx/loot-filters`
 
-![](https://github.com/riktenx/loot-filters/tree/readme-images/header.png)
+![](https://github.com/riktenx/loot-filters/blob/main/readme-images/header.png)
 
 ## Overview
 
