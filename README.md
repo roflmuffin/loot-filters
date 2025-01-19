@@ -25,3 +25,36 @@ The plugin provides the following extensions over the base Ground Items experien
   * Save/load multiple filters
   * Import current config (highlight, hide, and value rules) into a new filter
   * Automatically toggle active filter based on your position in the game world (e.g. for bossing)
+
+## Loot Filters
+
+The primary addition in this plugin is the introduction of a simple but powerful scripting language to control when and
+how items on the ground are displayed. An individual script is known as a **loot filter**.
+
+Loot filters are essentially a list of **matchers**: pairs of **item rules** and **display settings**, which controls the
+text overlay for items on the ground.
+
+### Matchers
+
+Filters can match on various characteristics of an item:
+* name / id
+* value
+* quantity of stacked items
+
+Items that match a particular set of conditions can be configured to display in various ways:
+* show/hide
+* display colors - text, background, and border
+* text extensions - show value, show despawn
+* show/hide lootbeam
+
+The teaser image at the top of this README provides an example of what is possible with loot filters.
+
+The scripting language resembles something like C, but you shouldn't need any experience with computer programming to
+design your own loot filters.
+
+Loot filters work together with the basic config options to decide how to render text overlays for items on the ground.
+Additionally, you can capture the current state of your config - your highlighted/hidden items, and your item value
+rules - and save them to a new filter which you can then re-load at a later date. This allows you to configure different
+filters for different in-game activities.
+
+For a comprehensive reference for writing your own loot filters, see [this guide](https://github.com/riktenx/loot-filters/blob/main/guides/loot-filters.md).
