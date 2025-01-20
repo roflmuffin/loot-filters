@@ -5,6 +5,7 @@ import com.google.gson.reflect.TypeToken;
 import com.google.inject.Provides;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
@@ -93,14 +94,11 @@ public class LootFiltersPlugin extends Plugin {
         return new Gson().fromJson(configManager.getConfiguration(CONFIG_GROUP, USER_FILTERS_KEY), type);
 	}
 
-	public void setUserFilters(List<String> filters) {
+	@SneakyThrows // incoming user filters are vetted at this point, exceptions are a defect
+    public void setUserFilters(List<String> filters) {
 		parsedUserFilters = new ArrayList<>();
 		for (var filter : filters) {
-			try {
-				parsedUserFilters.add(LootFilter.fromSource(filter));
-			} catch (Exception e) {
-				// pass - shouldn't occur, filters are vetted before this point
-			}
+			parsedUserFilters.add(LootFilter.fromSource(filter));
 		}
 
 		var json = new Gson().toJson(filters);

@@ -5,6 +5,7 @@ import lombok.SneakyThrows;
 import net.runelite.client.ui.FontManager;
 import net.runelite.client.ui.PluginPanel;
 
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -14,6 +15,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -41,23 +44,27 @@ public class LootFiltersPanel extends PluginPanel {
     private final LootFiltersPlugin plugin;
     private final JComboBox<String> filterSelect;
     private final JTextArea filterText;
+    private final JButton saveChanges;
     private final JPanel root;
 
     public LootFiltersPanel(LootFiltersPlugin plugin) throws Exception {
         this.plugin = plugin;
 
         filterSelect = new JComboBox<>();
-        filterText = new JTextArea(24, 30);
+        filterText = new JTextArea(23, 30);
+        saveChanges = new JButton("Save");
+
         root = new JPanel();
         root.setLayout(new BoxLayout(root, BoxLayout.Y_AXIS));
 
         init();
-        initFilterSelect();
+        initControls();
     }
 
     private void init() {
         var top = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        var bottom = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        var textButtons = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        var textPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         var label = new JLabel("Active filter:");
         var importClipboard = createIconButton("import_clipboard",
@@ -71,22 +78,26 @@ public class LootFiltersPanel extends PluginPanel {
                 this::onDeleteActive);
         var deleteAll = new JButton("Delete all");
         deleteAll.addActionListener(it -> onDeleteAll());
+        saveChanges.addActionListener(it -> onSaveChanges());
 
         top.add(label);
         top.add(importClipboard);
         top.add(importConfig);
         top.add(deleteActive);
-        bottom.add(deleteAll);
-        bottom.add(new JScrollPane(filterText));
+        textButtons.add(deleteAll);
+        textButtons.add(Box.createHorizontalStrut(50));
+        textButtons.add(saveChanges);
+        textPanel.add(new JScrollPane(filterText));
 
         root.add(top);
         root.add(filterSelect);
-        root.add(bottom);
+        root.add(textButtons);
+        root.add(textPanel);
 
         add(root);
     }
 
-    private void initFilterSelect() throws IOException {
+    private void initControls() throws IOException {
         var filters = plugin.getUserFilters();
         filterSelect.addItem(NONE_ITEM);
         for (var filter : filters) {
@@ -101,6 +112,22 @@ public class LootFiltersPanel extends PluginPanel {
         filterSelect.addActionListener(this::onFilterSelect);
 
         filterText.setLineWrap(true);
+        filterText.getDocument().addDocumentListener(new DocumentListener() {
+            private void onChange() {
+                var index = plugin.getUserFilterIndex();
+                if (index == -1) {
+                    saveChanges.setVisible(false);
+                    return;
+                }
+
+                var existingSrc = plugin.getUserFilters().get(index);
+                saveChanges.setVisible(!existingSrc.equals(filterText.getText()));
+            }
+
+            @Override public void insertUpdate(DocumentEvent e) { onChange(); }
+            @Override public void removeUpdate(DocumentEvent e) { onChange(); }
+            @Override public void changedUpdate(DocumentEvent e) { onChange(); }
+        });
         updateFilterText(index);
     }
 
@@ -197,6 +224,23 @@ public class LootFiltersPanel extends PluginPanel {
         invokeLater(() -> filterSelect.addActionListener(this::onFilterSelect));
     }
 
+    private void onSaveChanges() {
+        var newSrc = filterText.getText();
+        try {
+            LootFilter.fromSource(newSrc);
+        } catch (CompileException | IOException e) {
+            plugin.addChatMessage("Cannot update active filter: " + e.getMessage());
+        }
+
+        if (!confirm("Save changes to the active filter?")) {
+            return;
+        }
+
+        var filters = plugin.getUserFilters();
+        filters.set(plugin.getUserFilterIndex(), newSrc);
+        plugin.setUserFilters(filters);
+    }
+
     private boolean tryUpdateExisting(String newName, String newSrc) {
         var existing = plugin.getUserFilters();
         for (int i = 0; i < filterSelect.getItemCount(); ++i) {
@@ -218,13 +262,10 @@ public class LootFiltersPanel extends PluginPanel {
         if (index > -1) {
             filterText.setText(plugin.getUserFilters().get(index));
             filterText.setEnabled(true);
-            filterText.setEditable(false);
-            filterText.setBackground(TEXT_BG_ACTIVE);
             filterText.setFont(TEXT_FONT_ACTIVE);
         } else {
             filterText.setText(NONE_TEXT);
             filterText.setEnabled(false);
-            filterText.setBackground(null);
             filterText.setFont(FontManager.getRunescapeFont());
         }
         filterText.setCaretPosition(0);
