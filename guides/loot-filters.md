@@ -96,7 +96,7 @@ Match based on an item's quantity.
 
 #### value `value:>500`
 
-Match based on an item's grand exchange or high alch value. The highest of the two is chosen.
+Match based on an item value. The value used for comparison is determined by plugin settings (GE, HA, or highest).
 
 ### Display settings
 
