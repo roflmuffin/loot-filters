@@ -100,6 +100,15 @@ public class LootFiltersPanel extends PluginPanel {
             return;
         }
 
+        if (newFilter.getName() == null || newFilter.getName().isBlank()) {
+            var newName = showInputDialog(this, "This filter does not have a name. Enter one:");
+            if (newName == null || newName.isBlank()) {
+                return;
+            }
+            newSrc = "meta { name = " + quote(newName) + "; }\n" + newSrc;
+            newFilter.setName(newName);
+        }
+
         if (tryUpdateExisting(newFilter.getName(), newSrc)) {
             return;
         }
@@ -170,7 +179,7 @@ public class LootFiltersPanel extends PluginPanel {
                 continue;
             }
             if (!confirm("Filter " + quote(newName) + " already exists. Update it?")) {
-                return false;
+                return true;
             }
 
             existing.set(i, newSrc);

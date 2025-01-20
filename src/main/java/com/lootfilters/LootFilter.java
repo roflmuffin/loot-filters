@@ -12,6 +12,7 @@ import com.lootfilters.serde.RuleDeserializer;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Setter;
 import net.runelite.api.TileItem;
 import net.runelite.api.coords.WorldPoint;
 
@@ -25,7 +26,8 @@ import static com.lootfilters.util.TextUtil.loadFilterScript;
 @AllArgsConstructor
 @EqualsAndHashCode
 public class LootFilter {
-    private final String name;
+    @Setter private String name; // anonymous filter can be imported, would need name
+
     private final String description;
     private final int[] activationArea;
     private final List<MatcherConfig> matchers;

@@ -41,8 +41,8 @@ public class Parser {
     private final TokenStream tokens;
     private final List<MatcherConfig> matchers = new ArrayList<>();
 
-    private String name = "<no name>";
-    private String description = "<no description>";
+    private String name;
+    private String description;
     private int[] activationArea = null;
 
     public Parser(List<Token> tokens) {
