@@ -58,13 +58,13 @@ public class FilterUtil {
      * Captures the current config-based item matchers, exporting them to their own filter.
      */
     public static String configToFilterSource(LootFiltersConfig config, String name) {
-        var defines = "#define HIGHLIGHT_COLOR " + quote(colorToAlphaHexCode(config.highlightColor()));
-        var meta = "meta { name = " + quote(name) + "; }";
+        var defines = "#define HCOLOR " + quote(colorToAlphaHexCode(config.highlightColor()));
+        var meta = "meta {\n  name = " + quote(name) + ";\n}\n\n";
 
         var highlights = "";
         if (!config.highlightedItems().isBlank()) {
             highlights = stream(config.highlightedItems().split(","))
-                    .map(it -> "HIGHLIGHT(" + quote(it) + ", HIGHLIGHT_COLOR)")
+                    .map(it -> "HIGHLIGHT(" + quote(it) + ", HCOLOR)")
                     .collect(joining("\n"));
         }
         var hides = "";
@@ -91,7 +91,7 @@ public class FilterUtil {
             return "";
         }
 
-        return format("if (value:>%d) { color = %s; showLootbeam = %b; }",
+        return format("if (value:>%d) {\n  color = %s;\n  showLootbeam = %b;\n}\n",
                 value,
                 quote(colorToAlphaHexCode(color)),
                 showLootbeam);

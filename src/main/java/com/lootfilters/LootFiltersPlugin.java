@@ -107,7 +107,10 @@ public class LootFiltersPlugin extends Plugin {
 
 	public int getUserFilterIndex() {
 		var indexCfg = configManager.getConfiguration(CONFIG_GROUP, USER_FILTERS_INDEX_KEY);
-        return indexCfg == null || indexCfg.isEmpty() ? -1 : Integer.parseInt(indexCfg);
+        var index = indexCfg == null || indexCfg.isEmpty()
+				? -1
+				: Integer.parseInt(indexCfg);
+		return Math.max(index, -1);
 	}
 
 	public void setUserFilterIndex(int index) {
