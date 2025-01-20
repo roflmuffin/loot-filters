@@ -60,12 +60,20 @@ public class FilterUtil {
     public static String configToFilterSource(LootFiltersConfig config, String name) {
         var defines = "#define HIGHLIGHT_COLOR " + quote(colorToAlphaHexCode(config.highlightColor()));
         var meta = "meta { name = " + quote(name) + "; }";
-        var highlights = stream(config.highlightedItems().split(","))
-                .map(it -> "HIGHLIGHT(" + quote(it) + ", HIGHLIGHT_COLOR)")
-                .collect(joining("\n"));
-        var hides = stream(config.hiddenItems().split(","))
-                .map(it -> "HIDE("+ quote(it) + ")")
-                .collect(joining("\n"));
+
+        var highlights = "";
+        if (!config.highlightedItems().isBlank()) {
+            highlights = stream(config.highlightedItems().split(","))
+                    .map(it -> "HIGHLIGHT(" + quote(it) + ", HIGHLIGHT_COLOR)")
+                    .collect(joining("\n"));
+        }
+        var hides = "";
+
+        if (!config.hiddenItems().isBlank()) {
+            hides = stream(config.hiddenItems().split(","))
+                    .map(it -> "HIDE("+ quote(it) + ")")
+                    .collect(joining("\n"));
+        }
 
         return String.join("\n",
                 defines,
