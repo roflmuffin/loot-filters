@@ -73,13 +73,14 @@ public class LootFiltersPanel extends PluginPanel {
 
     private void initFilterSelect() throws IOException {
         var filters = plugin.getUserFilters();
+        filterSelect.addItem("<none>");
         for (var filter : filters) {
             filterSelect.addItem(LootFilter.fromSource(filter).getName());
         }
 
         var index = plugin.getUserFilterIndex();
         if (index <= filters.size() - 1) {
-            filterSelect.setSelectedIndex(index);
+            filterSelect.setSelectedIndex(index + 1);
         }
 
         filterSelect.addActionListener(it -> onFilterSelect());
@@ -135,17 +136,16 @@ public class LootFiltersPanel extends PluginPanel {
 
         filterSelect.addItem(newFilter.getName());
         plugin.setUserFilters(append(plugin.getUserFilters(), src));
+        plugin.getConfig().setHighlightedItems("");
+        plugin.getConfig().setHiddenItems("");
     }
 
     private void onFilterSelect() {
-        var newIndex = filterSelect.getSelectedIndex();
-        if (newIndex > -1) {
-            plugin.setUserFilterIndex(newIndex);
-        }
+        plugin.setUserFilterIndex(filterSelect.getSelectedIndex() - 1);
     }
 
     private void onDeleteActive() {
-        var toDelete = filterSelect.getSelectedIndex();
+        var toDelete = filterSelect.getSelectedIndex() - 1;
         if (plugin.getUserFilters().isEmpty() || toDelete == -1) {
             return;
         }
@@ -156,8 +156,8 @@ public class LootFiltersPanel extends PluginPanel {
         var newCfg = new ArrayList<>(plugin.getUserFilters());
         newCfg.remove(toDelete);
 
-        filterSelect.removeItemAt(toDelete);
-        filterSelect.setSelectedIndex(-1);
+        filterSelect.removeItemAt(toDelete + 1);
+        filterSelect.setSelectedIndex(0);
         plugin.setUserFilters(newCfg);
         plugin.setUserFilterIndex(-1);
     }
@@ -167,7 +167,8 @@ public class LootFiltersPanel extends PluginPanel {
         if (!confirm("Are you sure?")) { return; }
 
         filterSelect.removeAllItems();
-        filterSelect.setSelectedIndex(-1);
+        filterSelect.addItem("<none>");
+        filterSelect.setSelectedIndex(0);
         plugin.setUserFilters(emptyList());
         plugin.setUserFilterIndex(-1);
     }
