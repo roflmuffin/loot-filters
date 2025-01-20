@@ -3,6 +3,7 @@ package com.lootfilters.util;
 import com.lootfilters.LootFilter;
 import com.lootfilters.LootFiltersConfig;
 import com.lootfilters.MatcherConfig;
+import com.lootfilters.rule.ValueTier;
 
 import java.util.ArrayList;
 import java.util.stream.Collectors;
@@ -24,13 +25,25 @@ public class FilterUtil {
 
         matchersWithConfig.addAll(filter.getMatchers());
 
-        matchersWithConfig.add(MatcherConfig.highlight(config.highlightedItems(), config.highlightColor(), config.highlightLootbeam()));
+        matchersWithConfig.add(MatcherConfig.highlight(
+                config.highlightedItems(), config.highlightColor(), config.highlightLootbeam(), config.highlightNotify()));
         matchersWithConfig.add(MatcherConfig.hide(config.hiddenItems()));
 
-        matchersWithConfig.add(MatcherConfig.valueTier(config.enableInsaneItemValueTier(), config.insaneValue(), config.insaneValueColor(), true));
-        matchersWithConfig.add(MatcherConfig.valueTier(config.enableHighItemValueTier(), config.highValue(), config.highValueColor(), true));
-        matchersWithConfig.add(MatcherConfig.valueTier(config.enableMediumItemValueTier(), config.mediumValue(), config.mediumValueColor(), false));
-        matchersWithConfig.add(MatcherConfig.valueTier(config.enableLowItemValueTier(), config.lowValue(), config.lowValueColor(), false));
+        matchersWithConfig.add(MatcherConfig.valueTier(
+                config.enableInsaneItemValueTier(), config.insaneValue(), config.insaneValueColor(),
+                true, true));
+        matchersWithConfig.add(MatcherConfig.valueTier(
+                config.enableHighItemValueTier(), config.highValue(), config.highValueColor(),
+                config.lootbeamTier().ordinal() >= ValueTier.HIGH.ordinal(),
+                config.notifyTier().ordinal() >= ValueTier.HIGH.ordinal()));
+        matchersWithConfig.add(MatcherConfig.valueTier(
+                config.enableMediumItemValueTier(), config.mediumValue(), config.mediumValueColor(),
+                config.lootbeamTier().ordinal() >= ValueTier.MEDIUM.ordinal(),
+                config.notifyTier().ordinal() >= ValueTier.MEDIUM.ordinal()));
+        matchersWithConfig.add(MatcherConfig.valueTier(
+                config.enableLowItemValueTier(), config.lowValue(), config.lowValueColor(),
+                config.lootbeamTier().ordinal() >= ValueTier.LOW.ordinal(),
+                config.notifyTier().ordinal() >= ValueTier.LOW.ordinal()));
         matchersWithConfig.add(MatcherConfig.hiddenTier(config.hideTierEnabled(), config.hideTierValue()));
 
         matchersWithConfig.add(MatcherConfig.showUnmatched(config.showUnmatchedItems()));

@@ -21,6 +21,7 @@ public class DisplayConfig {
     private final boolean showLootbeam;
     private final boolean showValue;
     private final boolean showDespawn;
+    private final boolean notify;
 
     public DisplayConfig(Color textColor) {
         this.textColor = textColor;
@@ -30,5 +31,6 @@ public class DisplayConfig {
         showLootbeam = false;
         showValue = false;
         showDespawn = false;
+        notify = false;
     }
 }

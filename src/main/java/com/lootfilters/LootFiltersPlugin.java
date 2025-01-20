@@ -14,6 +14,7 @@ import net.runelite.api.events.ItemDespawned;
 import net.runelite.api.events.ItemSpawned;
 import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.events.MenuOpened;
+import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
@@ -48,8 +49,8 @@ public class LootFiltersPlugin extends Plugin {
 	public static final String USER_FILTERS_INDEX_KEY = "user-filters-index";
 
 	@Inject private Client client;
-	@Inject private ClientToolbar clientToolbar;
 	@Inject private ClientThread clientThread;
+	@Inject private ClientToolbar clientToolbar;
 
 	@Inject private LootFiltersConfig config;
 	@Inject private LootFiltersOverlay overlay;
@@ -61,6 +62,7 @@ public class LootFiltersPlugin extends Plugin {
 	@Inject private MouseManager mouseManager;
 	@Inject private ConfigManager configManager;
 	@Inject private ItemManager itemManager;
+	@Inject private Notifier notifier;
 
 	private LootFiltersPanel pluginPanel;
 	private NavigationButton pluginPanelNav;
@@ -188,14 +190,14 @@ public class LootFiltersPlugin extends Plugin {
 		var item = event.getItem();
 		tileItemIndex.put(tile, item);
 
-		// lootbeams
 		var match = getActiveFilter().findMatch(this, item);
-		if (match == null || !match.isShowLootbeam()) {
-			return;
+		if (match != null && match.isShowLootbeam()) {
+			var beam = new Lootbeam(client, clientThread, tile.getWorldLocation(), match.getTextColor(), Lootbeam.Style.MODERN);
+			lootbeamIndex.put(tile, item, beam);
 		}
-
-		var beam = new Lootbeam(client, clientThread, tile.getWorldLocation(), match.getTextColor(), Lootbeam.Style.MODERN);
-		lootbeamIndex.put(tile, item, beam);
+		if (match != null && match.isNotify()) {
+			notifier.notify(getItemName(item.getId()));
+		}
 	}
 
 	@Subscribe

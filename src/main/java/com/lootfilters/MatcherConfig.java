@@ -56,7 +56,7 @@ public class MatcherConfig {
         return new MatcherConfig(rule, display);
     }
 
-    public static MatcherConfig valueTier(boolean enabled, int value, Color color, boolean showLootbeam) {
+    public static MatcherConfig valueTier(boolean enabled, int value, Color color, boolean showLootbeam, boolean notify) {
         var inner = new ItemValueRule(value, Comparator.GT_EQ);
         var rule = new Rule("") {
             @Override public boolean test(LootFiltersPlugin plugin, TileItem item) {
@@ -65,8 +65,9 @@ public class MatcherConfig {
         };
         var display = DisplayConfig.builder()
                 .textColor(color)
-                .showLootbeam(showLootbeam)
                 .showValue(true)
+                .showLootbeam(showLootbeam)
+                .notify(notify)
                 .build();
         return new MatcherConfig(rule, display);
     }
@@ -84,7 +85,7 @@ public class MatcherConfig {
         return new MatcherConfig(rule, display);
     }
 
-    public static MatcherConfig highlight(String rawNames, Color color, boolean showLootbeam) {
+    public static MatcherConfig highlight(String rawNames, Color color, boolean showLootbeam, boolean notify) {
         var rule = new OrRule(
                 Arrays.stream(rawNames.split(","))
                         .map(ItemNameRule::new)
@@ -93,6 +94,7 @@ public class MatcherConfig {
         var display = DisplayConfig.builder()
                 .textColor(color)
                 .showLootbeam(showLootbeam)
+                .notify(notify)
                 .build();
         return new MatcherConfig(rule, display);
     }

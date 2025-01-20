@@ -156,6 +156,8 @@ public class Parser {
                     builder.showValue(assign[1].expectBoolean()); break;
                 case "showDespawn":
                     builder.showDespawn(assign[1].expectBoolean()); break;
+                case "notify":
+                    builder.notify(assign[1].expectBoolean()); break;
                 default:
                     throw new ParseException("unexpected identifier in display config block", assign[0]);
             }

@@ -1,5 +1,6 @@
 package com.lootfilters;
 
+import com.lootfilters.rule.ValueTier;
 import com.lootfilters.rule.ValueType;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
@@ -159,6 +160,14 @@ public interface LootFiltersConfig extends Config {
             position = 3
     )
     default boolean highlightLootbeam() { return false; }
+    @ConfigItem(
+            keyName = "highlightNotify",
+            name = "Highlight notification",
+            description = "Configures whether highlighted items fire a system notification.",
+            section = itemLists,
+            position = 4
+    )
+    default boolean highlightNotify() { return false; }
 
     @ConfigSection(
             name = "Item value rules",
@@ -167,11 +176,27 @@ public interface LootFiltersConfig extends Config {
     )
     String itemValueRules = "itemValueRules";
     @ConfigItem(
+            keyName = "lootbeamTier",
+            name = "Lootbeam tier",
+            description = "Minimum tier at which to show a lootbeam.",
+            section = itemValueRules,
+            position = 0
+    )
+    default ValueTier lootbeamTier() { return ValueTier.HIGH; }
+    @ConfigItem(
+            keyName = "notifyTier",
+            name = "Notification tier",
+            description = "Minimum tier at which to fire a system notification.",
+            section = itemValueRules,
+            position = 0
+    )
+    default ValueTier notifyTier() { return ValueTier.HIGH; }
+    @ConfigItem(
             keyName = "enableInsaneItemValueTier",
             name = "Insane tier",
             description = "Enable INSANE item value tier.",
             section = itemValueRules,
-            position = 1
+            position = 11
     )
     default boolean enableInsaneItemValueTier() { return true; }
     @ConfigItem(
@@ -179,7 +204,7 @@ public interface LootFiltersConfig extends Config {
             name = "Insane value",
             description = "Configures the value for INSANE tier.",
             section = itemValueRules,
-            position = 2
+            position = 12
     )
     default int insaneValue() { return 10_000_000; }
     @ConfigItem(
@@ -187,7 +212,7 @@ public interface LootFiltersConfig extends Config {
             name = "Insane color",
             description = "Configures the color for INSANE item values.",
             section = itemValueRules,
-            position = 3
+            position = 13
     )
     default Color insaneValueColor() { return Color.decode("#ff66b2"); }
     @ConfigItem(
@@ -195,7 +220,7 @@ public interface LootFiltersConfig extends Config {
             name = "High tier",
             description = "Enable high item value tier.",
             section = itemValueRules,
-            position = 4
+            position = 14
     )
     default boolean enableHighItemValueTier() { return true; }
     @ConfigItem(
@@ -203,7 +228,7 @@ public interface LootFiltersConfig extends Config {
             name = "High value",
             description = "Configures the value for high tier.",
             section = itemValueRules,
-            position = 5
+            position = 15
     )
     default int highValue() { return 1_000_000; }
     @ConfigItem(
@@ -211,7 +236,7 @@ public interface LootFiltersConfig extends Config {
             name = "High color",
             description = "Configures the color for high item values.",
             section = itemValueRules,
-            position = 6
+            position = 16
     )
     default Color highValueColor() { return Color.decode("#ff9600"); }
     @ConfigItem(
@@ -219,7 +244,7 @@ public interface LootFiltersConfig extends Config {
             name = "Medium tier",
             description = "Enable medium item value tier.",
             section = itemValueRules,
-            position = 7
+            position = 17
     )
     default boolean enableMediumItemValueTier() { return true; }
     @ConfigItem(
@@ -227,7 +252,7 @@ public interface LootFiltersConfig extends Config {
             name = "Medium value",
             description = "Configures the value for medium tier.",
             section = itemValueRules,
-            position = 8
+            position = 18
     )
     default int mediumValue() { return 100_000; }
     @ConfigItem(
@@ -235,7 +260,7 @@ public interface LootFiltersConfig extends Config {
             name = "Medium color",
             description = "Configures the color for medium item values.",
             section = itemValueRules,
-            position = 9
+            position = 19
     )
     default Color mediumValueColor() { return Color.decode("#99ff99"); }
     @ConfigItem(
@@ -243,7 +268,7 @@ public interface LootFiltersConfig extends Config {
             name = "Low tier",
             description = "Enable low item value tier.",
             section = itemValueRules,
-            position = 10
+            position = 20
     )
     default boolean enableLowItemValueTier() { return true; }
     @ConfigItem(
@@ -251,7 +276,7 @@ public interface LootFiltersConfig extends Config {
             name = "Low value",
             description = "Configures the value for low tier.",
             section = itemValueRules,
-            position = 11
+            position = 21
     )
     default int lowValue() { return 10_000; }
     @ConfigItem(
@@ -259,15 +284,15 @@ public interface LootFiltersConfig extends Config {
             name = "Low color",
             description = "Configures the color for low item values.",
             section = itemValueRules,
-            position = 12
+            position = 22
     )
     default Color lowValueColor() { return Color.decode("#66b2ff"); }
     @ConfigItem(
             keyName = "hiddenTierEnabled",
-            name = "Hidden tier",
+            name = "Hide below value tier",
             description = "Hide items below a certain value.",
             section = itemValueRules,
-            position = 13
+            position = 23
     )
     default boolean hideTierEnabled() { return false; }
     @ConfigItem(
@@ -275,7 +300,7 @@ public interface LootFiltersConfig extends Config {
             name = "Hide below value",
             description = "Hide items below this value, if enabled.",
             section = itemValueRules,
-            position = 14
+            position = 24
     )
     default int hideTierValue() { return 0; }
 }

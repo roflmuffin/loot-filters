@@ -46,6 +46,7 @@ Items that match a particular set of conditions can be configured to display in 
 * display colors - text, background, and border
 * text extensions - show value, show despawn
 * show/hide lootbeam
+* notifications
 
 The teaser image at the top of this README provides an example of what is possible with loot filters.
 
