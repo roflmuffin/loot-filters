@@ -7,13 +7,16 @@ import com.lootfilters.rule.ItemNameRule;
 import com.lootfilters.rule.ItemQuantityRule;
 import com.lootfilters.rule.ItemValueRule;
 import com.lootfilters.rule.OrRule;
+import org.junit.Test;
 
 import java.awt.Color;
 import java.util.List;
-import java.util.Objects;
+
+import static org.junit.Assert.assertEquals;
 
 public class LootFilterSerdeTest {
-    public static void main(String[] args) throws Exception {
+    @Test
+    public void testSerde() {
         var filter = new LootFilter(
                 "foo",
                 "bar",
@@ -43,8 +46,6 @@ public class LootFilterSerdeTest {
         var ser = filter.toJson();
         var deser = LootFilter.fromJson(ser);
 
-        if (!Objects.deepEquals(filter, deser)) {
-            throw new Exception("serialized and deserialized rules do not match");
-        }
+        assertEquals(filter, deser);
     }
 }
