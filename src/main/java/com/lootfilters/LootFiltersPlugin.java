@@ -58,6 +58,7 @@ public class LootFiltersPlugin extends Plugin {
 	@Inject private LootFiltersMouseAdapter mouseAdapter;
 	@Inject private LootFiltersHotkeyListener hotkeyListener;
 
+	@Inject private Gson gson;
 	@Inject private OverlayManager overlayManager;
 	@Inject private KeyManager keyManager;
 	@Inject private MouseManager mouseManager;
@@ -91,7 +92,7 @@ public class LootFiltersPlugin extends Plugin {
 		}
 
 		var type = new TypeToken<List<String>>(){}.getType();
-        return new Gson().fromJson(configManager.getConfiguration(CONFIG_GROUP, USER_FILTERS_KEY), type);
+        return gson.fromJson(configManager.getConfiguration(CONFIG_GROUP, USER_FILTERS_KEY), type);
 	}
 
 	@SneakyThrows // incoming user filters are vetted at this point, exceptions are a defect
@@ -101,7 +102,7 @@ public class LootFiltersPlugin extends Plugin {
 			parsedUserFilters.add(LootFilter.fromSource(filter));
 		}
 
-		var json = new Gson().toJson(filters);
+		var json = gson.toJson(filters);
 		configManager.setConfiguration(CONFIG_GROUP, USER_FILTERS_KEY, json);
 	}
 

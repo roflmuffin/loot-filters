@@ -1,6 +1,6 @@
 package com.lootfilters;
 
-import com.google.gson.GsonBuilder;
+import com.google.gson.Gson;
 import com.lootfilters.lang.CompileException;
 import com.lootfilters.lang.Lexer;
 import com.lootfilters.lang.Parser;
@@ -32,12 +32,12 @@ public class LootFilter {
     private final int[] activationArea;
     private final List<MatcherConfig> matchers;
 
-    public static LootFilter fromJson(String json) {
-        var gson = new GsonBuilder()
+    public static LootFilter fromJson(Gson gson, String json) {
+        var ggson = gson.newBuilder()
                 .registerTypeAdapter(Color.class, new ColorDeserializer())
-                .registerTypeAdapter(Rule.class, new RuleDeserializer())
+                .registerTypeAdapter(Rule.class, new RuleDeserializer(gson))
                 .create();
-        return gson.fromJson(json, LootFilter.class);
+        return ggson.fromJson(json, LootFilter.class);
     }
 
     public static LootFilter fromSource(String source) throws CompileException, IOException {
@@ -47,11 +47,11 @@ public class LootFilter {
         return new Parser(tokens).parse();
     }
 
-    public String toJson() {
-        var gson = new GsonBuilder()
+    public String toJson(Gson gson) {
+        var ggson = gson.newBuilder()
                 .registerTypeAdapter(Color.class, new ColorSerializer())
                 .create();
-        return gson.toJson(this);
+        return ggson.toJson(this);
     }
 
     public DisplayConfig findMatch(LootFiltersPlugin plugin, TileItem item) {

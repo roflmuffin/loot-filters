@@ -1,5 +1,6 @@
 package com.lootfilters;
 
+import com.google.gson.Gson;
 import com.lootfilters.rule.AndRule;
 import com.lootfilters.rule.Comparator;
 import com.lootfilters.rule.ItemIdRule;
@@ -43,8 +44,9 @@ public class LootFilterSerdeTest {
                 )
         );
 
-        var ser = filter.toJson();
-        var deser = LootFilter.fromJson(ser);
+        var gson = new Gson();
+        var ser = filter.toJson(gson);
+        var deser = LootFilter.fromJson(gson, ser);
 
         assertEquals(filter, deser);
     }
