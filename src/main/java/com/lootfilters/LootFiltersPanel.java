@@ -207,7 +207,7 @@ public class LootFiltersPanel extends PluginPanel {
                 return true;
             }
 
-            existing.set(i, newSrc);
+            existing.set(i - 1, newSrc);
             plugin.setUserFilters(existing);
             return true;
         }

@@ -22,7 +22,7 @@ import static net.runelite.api.Perspective.getCanvasTextLocation;
 import static net.runelite.client.ui.FontManager.getRunescapeSmallFont;
 
 public class LootFiltersOverlay extends Overlay {
-    private static final int Z_STACK_OFFSET = 16; // for initial perspective and subsequent vertical stack
+    private static final int Z_STACK_OFFSET = 17; // for initial perspective and subsequent vertical stack
     private static final int BOX_PAD = 2;
     private static final Color COLOR_HIDDEN = Color.GRAY.brighter();
 
