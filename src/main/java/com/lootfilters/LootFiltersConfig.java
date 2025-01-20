@@ -1,5 +1,6 @@
 package com.lootfilters;
 
+import com.lootfilters.rule.ValueType;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
@@ -42,8 +43,16 @@ public interface LootFiltersConfig extends Config {
             section = general,
             position = 3
     )
-
     default boolean ownershipFilter() { return false; }
+    @ConfigItem(
+            keyName = "valueType",
+            name = "Value type",
+            description = "The type of item value to use for rules and text overlay.",
+            section = general,
+            position = 4
+    )
+    default ValueType valueType() { return ValueType.HIGHEST; }
+
     @ConfigSection(
             name = "Hotkey",
             description = "Configure hotkey options.",

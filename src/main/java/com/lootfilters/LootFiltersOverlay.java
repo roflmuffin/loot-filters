@@ -69,7 +69,7 @@ public class LootFiltersOverlay extends Overlay {
                     continue;
                 }
 
-                var overrideHidden = plugin.isHotkeyActive() && plugin.getConfig().hotkeyShowHiddenItems();
+                var overrideHidden = plugin.isHotkeyActive() && config.hotkeyShowHiddenItems();
                 if (match.isHidden() && !overrideHidden) {
                     continue;
                 }
@@ -161,10 +161,26 @@ public class LootFiltersOverlay extends Overlay {
         if (display.isShowValue()) {
             var ge = itemManager.getItemPrice(item.getId());
             var ha = itemManager.getItemComposition(item.getId()).getHaPrice();
-            var value = Math.max(ge, ha) * item.getQuantity();
+            int value;
+            boolean isAlch;
+            switch (config.valueType()) {
+                case HIGHEST:
+                    value = Math.max(ge, ha);
+                    isAlch = ha > ge;
+                    break;
+                case GE:
+                    value = ge;
+                    isAlch = false;
+                    break;
+                default:
+                    value = ha;
+                    isAlch = true;
+                    break;
+            }
+            value *= item.getQuantity();
             if (value > 0) {
                 text += " (";
-                if (ha > ge) {
+                if (isAlch) {
                     text += "*";
                 }
                 text += getValueText(value) + ")";
