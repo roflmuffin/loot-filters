@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.lootfilters.util.TextUtil.isLegalIdent;
 import static com.lootfilters.util.TextUtil.isNumeric;
@@ -13,6 +14,7 @@ import static com.lootfilters.util.TextUtil.isWhitespace;
 @RequiredArgsConstructor
 public class Lexer {
     private static final LinkedHashMap<String, Token.Type> STATICS = new LinkedHashMap<>() {{
+        put("\\\n", Token.Type.WHITESPACE);
         put("#define", Token.Type.PREPROC_DEFINE);
         put("false", Token.Type.FALSE);
         put("true", Token.Type.TRUE);
@@ -44,29 +46,15 @@ public class Lexer {
     private int offset = 0;
 
     public List<Token> tokenize() throws TokenizeException {
-        var skipWhitespace = false;
         while (offset < input.length()) {
             if (tokenizeStatic()) {
                 continue;
             }
 
             var ch = input.charAt(offset);
-            if (ch == '\\') {
-                skipWhitespace = true;
-                ++offset;
-                continue;
-            }
             if (isWhitespace(ch)) {
-                if (skipWhitespace) {
-                    ++offset;
-                } else {
-                    tokenizeWhitespace();
-                }
-                continue;
-            }
-
-            skipWhitespace = false;
-            if (isNumeric(ch)) {
+                tokenizeWhitespace();
+            } else if (isNumeric(ch)) {
                 tokenizeLiteralInt();
             } else if (ch == '"') {
                 tokenizeLiteralString();
@@ -77,7 +65,9 @@ public class Lexer {
             }
         }
 
-        return tokens;
+        return tokens.stream() // un-map escaped newlines
+                .map(it -> it.getValue().equals("\\\n") ? new Token(Token.Type.WHITESPACE, "") : it)
+                .collect(Collectors.toList());
     }
 
     private boolean tokenizeStatic() {
