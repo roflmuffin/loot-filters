@@ -15,6 +15,13 @@ public class TokenStream {
     private final List<Token> tokens;
 
     /**
+     * Returns a shallow copy of the token stream.
+     */
+    public List<Token> getTokens() {
+        return new ArrayList<>(tokens);
+    }
+
+    /**
      * Peek at the first token in the stream, ignoring whitespace, without consuming it.
      */
     public Token peek() {
@@ -166,17 +173,6 @@ public class TokenStream {
     }
 
     /**
-     * Consumes all remaining tokens in the stream.
-     */
-    public List<Token> all() {
-        var ret = new ArrayList<Token>();
-        while (isNotEmpty()) {
-            ret.add(take());
-        }
-        return ret;
-    }
-
-    /**
      * Consumes an argument list at the head of the stream matching the grammar ( expr0, expr1, <...> exprN [,] ).
      */
     public List<TokenStream> takeArgList() {
@@ -195,7 +191,7 @@ public class TokenStream {
                 }
             } else if (head.is(Token.Type.EXPR_START)) {
                 var nestedExpr = expr.take(Token.Type.EXPR_START, Token.Type.EXPR_END, true);
-                current.addAll(nestedExpr.all());
+                current.addAll(nestedExpr.getTokens());
             } else {
                 current.add(expr.take());
             }

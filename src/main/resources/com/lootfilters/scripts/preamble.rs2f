@@ -7,18 +7,18 @@
 #define WHITE "ffffffff"
 #define BLACK "ff000000"
 
-#define BRONZE "5b462a"
-#define BLURITE "8f90d8"
-#define IRON "635c5b"
-#define ELEMENTAL "70119f"
-#define SILVER "a8a8b4"
-#define STEEL "908686"
-#define GOLD "d8b01a"
-#define LOVAKITE "641509"
-#define MITHRIL "4c4c70"
-#define LUNAR "727b72"
-#define ADAMANT "506450"
-#define RUNITE "516d78"
+#define BRONZE "ff5b462a"
+#define BLURITE "ff8f90d8"
+#define IRON "ff635c5b"
+#define ELEMENTAL "ff70119f"
+#define SILVER "ffa8a8b4"
+#define STEEL "ff908686"
+#define GOLD "ffd8b01a"
+#define LOVAKITE "ff641509"
+#define MITHRIL "ff4c4c70"
+#define LUNAR "ff727b72"
+#define ADAMANT "ff506450"
+#define RUNITE "ff516d78"
 
 #define GROUNDITEMS_INSANE "ffff66b2"
 #define GROUNDITEMS_HIGH "ffff9600"
@@ -27,3 +27,6 @@
 
 #define HIGHLIGHT(_name, _color) if (name:_name) { color = _color; }
 #define HIDE(_name) if (name:_name) { hidden = true; }
+
+#define RARE(_name, _color) if (name:_name) { color = _color; borderColor = _color; }
+#define RARE2(_name, _color) if (name:_name) { color = _color; borderColor = _color; backgroundColor = "80000000"; showLootbeam = true; }

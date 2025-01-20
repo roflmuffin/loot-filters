@@ -108,7 +108,7 @@ public class Preprocessor {
             }
             if (paramIndex > -1) {
                 var arg = args.get(paramIndex);
-                expanded.addAll(arg.all());
+                expanded.addAll(arg.getTokens());
             } else {
                 expanded.add(token);
             }
