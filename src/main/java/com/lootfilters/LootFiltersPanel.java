@@ -64,7 +64,7 @@ public class LootFiltersPanel extends PluginPanel {
                 "Import new filter from clipboard.",
                 this::onImportClipboard);
         var importConfig = createIconButton("import_config",
-                "Import highlight, hide, and item value config settings into a new filter.",
+                "Import item highlight and hide lists into a new filter. Doing this will also reset those lists.",
                 this::onImportConfig);
         var deleteActive = createIconButton("delete_active",
                 "Delete the currently active filter.",

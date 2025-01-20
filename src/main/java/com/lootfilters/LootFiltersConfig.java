@@ -262,4 +262,20 @@ public interface LootFiltersConfig extends Config {
             position = 12
     )
     default Color lowValueColor() { return Color.decode("#66b2ff"); }
+    @ConfigItem(
+            keyName = "hiddenTierEnabled",
+            name = "Hidden tier",
+            description = "Hide items below a certain value.",
+            section = itemValueRules,
+            position = 13
+    )
+    default boolean hideTierEnabled() { return false; }
+    @ConfigItem(
+            keyName = "hiddenValue",
+            name = "Hide below value",
+            description = "Hide items below this value, if enabled.",
+            section = itemValueRules,
+            position = 14
+    )
+    default int hideTierValue() { return 0; }
 }

@@ -71,6 +71,19 @@ public class MatcherConfig {
         return new MatcherConfig(rule, display);
     }
 
+    public static MatcherConfig hiddenTier(boolean enabled, int value) {
+        var inner = new ItemValueRule(value, Comparator.LT);
+        var rule = new Rule("") {
+            @Override public boolean test(LootFiltersPlugin plugin, TileItem item) {
+                return enabled && inner.test(plugin, item);
+            }
+        };
+        var display = DisplayConfig.builder()
+                .hidden(true)
+                .build();
+        return new MatcherConfig(rule, display);
+    }
+
     public static MatcherConfig highlight(String rawNames, Color color, boolean showLootbeam) {
         var rule = new OrRule(
                 Arrays.stream(rawNames.split(","))

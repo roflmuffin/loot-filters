@@ -4,12 +4,10 @@ import com.lootfilters.LootFilter;
 import com.lootfilters.LootFiltersConfig;
 import com.lootfilters.MatcherConfig;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 import static com.lootfilters.util.TextUtil.quote;
-import static java.lang.String.format;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
 import static net.runelite.client.util.ColorUtil.colorToAlphaHexCode;
@@ -33,6 +31,7 @@ public class FilterUtil {
         matchersWithConfig.add(MatcherConfig.valueTier(config.enableHighItemValueTier(), config.highValue(), config.highValueColor(), true));
         matchersWithConfig.add(MatcherConfig.valueTier(config.enableMediumItemValueTier(), config.mediumValue(), config.mediumValueColor(), false));
         matchersWithConfig.add(MatcherConfig.valueTier(config.enableLowItemValueTier(), config.lowValue(), config.lowValueColor(), false));
+        matchersWithConfig.add(MatcherConfig.hiddenTier(config.hideTierEnabled(), config.hideTierValue()));
 
         matchersWithConfig.add(MatcherConfig.showUnmatched(config.showUnmatchedItems()));
 
@@ -79,21 +78,6 @@ public class FilterUtil {
                 defines,
                 meta,
                 highlights,
-                hides,
-                toValueTierSource(config.enableInsaneItemValueTier(), config.insaneValue(), config.insaneValueColor(), true),
-                toValueTierSource(config.enableHighItemValueTier(), config.highValue(), config.highValueColor(), true),
-                toValueTierSource(config.enableMediumItemValueTier(), config.mediumValue(), config.mediumValueColor(), false),
-                toValueTierSource(config.enableLowItemValueTier(), config.lowValue(), config.lowValueColor(), false));
-    }
-
-    private static String toValueTierSource(boolean enabled, int value, Color color, boolean showLootbeam) {
-        if (!enabled) {
-            return "";
-        }
-
-        return format("if (value:>%d) {\n  color = %s;\n  showLootbeam = %b;\n}\n",
-                value,
-                quote(colorToAlphaHexCode(color)),
-                showLootbeam);
+                hides);
     }
 }
