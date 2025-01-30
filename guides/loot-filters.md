@@ -7,8 +7,8 @@ A loot filter is a basic script that contains the following
 * Any number of **matchers** - each being a tuple of condition and display config - that determines how to display items
   on the ground.
 
-For example, this is a simple loot filter with a single matcher that highlights anglerfish and coins with specific text
-colors:
+For example, this is a simple loot filter with two matchers: one that highlights anglerfish, and another that highlights
+coins with a lootbeam:
 
 ```
 meta {
@@ -22,6 +22,7 @@ if (name:"anglerfish") {
 
 if (name:"coins") {
   color = YELLOW; // and also, coins
+  showLootbeam = true;
 }
 ```
 
