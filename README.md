@@ -8,12 +8,12 @@ plugin.
 ## Overview
 
 This plugin replicates the majority of the experience offered by the base version:
+* ALT + mouse buttons toggle item hide/highlight (left click to highlight, right click to hide, middle click to reset)
 * Text overlay for ground items
 * Configure display colors based on item value
 * Collapse duplicate right-click menu entries
 * De-prioritize menu entries for hidden items
 * Lootbeams
-* Configure highlighted and hidden item lists in real-time using a configurable hotkey
 
 ## Additions
 
