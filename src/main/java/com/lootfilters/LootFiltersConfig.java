@@ -147,7 +147,7 @@ public interface LootFiltersConfig extends Config {
 
     @ConfigSection(
             name = "Item lists",
-            description = "Configure default lists of highlighted and hidden items. Values are case-insensitive, separated by comma. These lists are checked AFTER the active filter, but before item value rules.",
+            description = "Configure default lists of highlighted and hidden items. Values are case-insensitive, separated by comma. These lists are checked BEFORE the active filter.",
             position = 8
     )
     String itemLists = "itemLists";
@@ -199,7 +199,7 @@ public interface LootFiltersConfig extends Config {
 
     @ConfigSection(
             name = "Item value rules",
-            description = "Configure default rules for showing based on item value. These rules are checked AFTER both the active filter and the global hide list.",
+            description = "Configure default rules for showing based on item value. These rules are checked AFTER both the active filter and the global highlight/hide lists.",
             position = 9
     )
     String itemValueRules = "itemValueRules";

@@ -25,11 +25,11 @@ public class FilterUtil {
         matchersWithConfig.add(MatcherConfig.ownershipFilter(config.ownershipFilter()));
         matchersWithConfig.add(MatcherConfig.itemSpawnFilter(config.itemSpawnFilter()));
 
-        matchersWithConfig.addAll(filter.getMatchers());
-
         matchersWithConfig.add(MatcherConfig.highlight(
                 config.highlightedItems(), config.highlightColor(), config.highlightLootbeam(), config.highlightNotify()));
         matchersWithConfig.add(MatcherConfig.hide(config.hiddenItems()));
+
+        matchersWithConfig.addAll(filter.getMatchers());
 
         matchersWithConfig.add(MatcherConfig.valueTier(
                 config.enableInsaneItemValueTier(), config.insaneValue(), config.insaneValueColor(),
