@@ -153,6 +153,7 @@ public class Parser {
                 case "hidden":
                     builder.hidden(assign[1].expectBoolean()); break;
                 case "showLootbeam":
+                case "showLootBeam":
                     builder.showLootbeam(assign[1].expectBoolean()); break;
                 case "showValue":
                     builder.showValue(assign[1].expectBoolean()); break;
