@@ -9,7 +9,9 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
+import net.runelite.api.GameState;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemDespawned;
 import net.runelite.api.events.ItemSpawned;
@@ -212,6 +214,14 @@ public class LootFiltersPlugin extends Plugin {
 		var item = event.getItem();
 		tileItemIndex.remove(tile, item);
 		lootbeamIndex.remove(tile, item); // idempotent, we don't care if there wasn't a beam
+	}
+
+	@Subscribe
+	public void onGameStateChanged(GameStateChanged event) {
+		if (event.getGameState() == GameState.LOADING) {
+			tileItemIndex.clear();
+			lootbeamIndex.clear();
+		}
 	}
 
 	@Subscribe
