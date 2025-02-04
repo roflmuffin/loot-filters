@@ -2,6 +2,7 @@ package com.lootfilters.rule;
 
 import com.lootfilters.LootFiltersPlugin;
 import lombok.EqualsAndHashCode;
+import net.runelite.api.ItemID;
 import net.runelite.api.TileItem;
 
 @EqualsAndHashCode(callSuper = false)
@@ -15,7 +16,14 @@ public class ItemTradeableRule extends Rule {
 
     @Override
     public boolean test(LootFiltersPlugin plugin, TileItem item) {
-        boolean tradeable = plugin.getItemManager().getItemComposition(item.getId()).isTradeable();
-        return tradeable == target;
+        if (item.getId() == ItemID.COINS_995 || item.getId() == ItemID.PLATINUM_TOKEN) {
+            return true;
+        }
+
+        var comp = plugin.getItemManager().getItemComposition(item.getId());
+        var linkedComp = plugin.getItemManager().getItemComposition(comp.getLinkedNoteId());
+        return target
+                ? comp.isTradeable() || linkedComp.isTradeable()
+                : !comp.isTradeable() && !linkedComp.isTradeable();
     }
 }
