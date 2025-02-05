@@ -1,6 +1,6 @@
 # `riktenx/loot-filters`
 
-![](https://github.com/riktenx/loot-filters/blob/main/readme-images/header.png)
+![](https://github.com/riktenx/loot-filters/blob/main/readme-images/header_new.png)
 
 Loot Filters (AKA "Improved Ground Items") is an opinionated extension on top of Runelite's built-in Ground Items
 plugin.
