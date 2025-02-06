@@ -2,8 +2,8 @@
 
 ![](https://github.com/riktenx/loot-filters/blob/main/readme-images/header_new.png)
 
-Loot Filters (AKA "Improved Ground Items") is an opinionated extension on top of Runelite's built-in Ground Items
-plugin.
+Loot Filters (AKA "Improved Ground Items") is an extended, highly-customizable replacement for Runelite's built-in
+ground items plugin.
 
 ## Overview
 
@@ -40,12 +40,13 @@ Filters can match on various characteristics of an item:
 * name / id
 * value
 * quantity of stacked items
+* whether an item is tradeable
 
 Items that match a particular set of conditions can be configured to display in various ways:
 * show/hide
-* display colors - text, background, and border
-* text extensions - show value, show despawn
-* show/hide lootbeam
+* display colors - text, background, border, and more
+
+* show a lootbeam
 * notifications
 
 The teaser image at the top of this README provides an example of what is possible with loot filters.
