@@ -68,7 +68,7 @@ public class LootFiltersOverlay extends Overlay {
                     .collect(groupingBy(TileItem::getId, counting()));
 
             var tile = entry.getKey();
-            var currentOffset = 0;
+            var runningOffset = 0;
             for (var id : itemCounts.keySet()) {
                 var count = itemCounts.get(id);
                 var item = items.stream()
@@ -104,6 +104,9 @@ public class LootFiltersOverlay extends Overlay {
                 var fm = g.getFontMetrics(match.getFont());
                 var textWidth = fm.stringWidth(displayText);
                 var textHeight = fm.getHeight();
+
+                var currentOffset = runningOffset;
+                runningOffset += textHeight + BOX_PAD + 3; // draw is confirmed, update offsets
 
                 var text = new TextComponent();
                 text.setText(displayText);
@@ -170,8 +173,6 @@ public class LootFiltersOverlay extends Overlay {
                         timer.render(g);
                     }
                 }
-
-                currentOffset += textHeight + BOX_PAD + 3;
             }
         }
 
@@ -261,9 +262,5 @@ public class LootFiltersOverlay extends Overlay {
         g.setColor(Color.WHITE);
         g.drawString("items: " + itemCount, 0, 32);
         g.drawString("lootbeams: " + plugin.getLootbeamIndex().size(), 0, 48);
-    }
-
-    private void renderDespawnTimer() {
-
     }
 }
