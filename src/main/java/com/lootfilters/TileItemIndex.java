@@ -58,7 +58,12 @@ public class TileItemIndex {
         }
     }
 
+    public int pointIndexSize() {
+        return pointIndex.size();
+    }
+
     public void clear() {
         itemIndex.clear();
+        pointIndex.clear();
     }
 }

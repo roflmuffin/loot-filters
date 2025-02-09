@@ -233,7 +233,7 @@ public class LootFiltersOverlay extends Overlay {
             screenY += 16;
         }
         g.setColor(Color.WHITE);
-        g.drawString("items: " + itemCount, 0, 32);
+        g.drawString("items: " + itemCount + "," + plugin.getTileItemIndex().pointIndexSize(), 0, 32);
         g.drawString("lootbeams: " + plugin.getLootbeamIndex().size(), 0, 48);
     }
 }
