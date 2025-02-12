@@ -5,6 +5,8 @@
 Loot Filters (AKA "Improved Ground Items") is an extended, highly-customizable replacement for Runelite's built-in
 ground items plugin.
 
+Join the Discord! https://discord.gg/ESbA28wPnt
+
 ## Overview
 
 This plugin replicates the majority of the experience offered by the base version:
