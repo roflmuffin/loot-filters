@@ -85,12 +85,9 @@ activation area:
 [x0, y0, z0, x1, y1, z1]
 ```
 
-There are several excellent web-based tools for finding map coordinates:
-* https://explv.github.io/
-* https://mejrs.github.io/
+There are several excellent web-based tools for finding map coordinates, such as https://mejrs.github.io/.
 
-For example, the coordinate pair `[2240, 4032, 0, 2303, 4095, 0]`
-[describes the area for Vorkath](https://explv.github.io/?centreX=2284&centreY=4084&centreZ=0&zoom=8).
+For example, the coordinate pair `[2240, 4032, 0, 2303, 4095, 0]` describes the area for Vorkath.
 
 ## Matchers
 
