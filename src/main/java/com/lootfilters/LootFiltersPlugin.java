@@ -2,7 +2,6 @@ package com.lootfilters;
 
 import com.google.gson.Gson;
 import com.google.inject.Provides;
-import com.lootfilters.model.PluginTileItem;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -187,7 +186,7 @@ public class LootFiltersPlugin extends Plugin {
 	@Subscribe
 	public void onItemSpawned(ItemSpawned event) {
 		var tile = event.getTile();
-		var item = new PluginTileItem(this, event.getItem());
+		var item = event.getItem();
 		tileItemIndex.put(tile, item);
 
 		var match = getActiveFilter().findMatch(this, item);
@@ -210,7 +209,7 @@ public class LootFiltersPlugin extends Plugin {
 	@Subscribe
 	public void onItemDespawned(ItemDespawned event) {
 		var tile = event.getTile();
-		var item = new PluginTileItem(this, event.getItem());
+		var item = event.getItem();
 		tileItemIndex.remove(tile, item);
 		lootbeamIndex.remove(tile, item); // idempotent, we don't care if there wasn't a beam
 	}
@@ -267,7 +266,7 @@ public class LootFiltersPlugin extends Plugin {
 		var toDispatch = tileItemIndex.entrySet().stream()
 				.filter(it -> it.getKey().getItemLayer() == null)
 				.flatMap(entry -> entry.getValue().stream()
-						.map(item -> new ItemDespawned(entry.getKey(), ((PluginTileItem) item).getDelegate())))
+						.map(item -> new ItemDespawned(entry.getKey(), item)))
 				.collect(Collectors.toList());
 		for (var event : toDispatch) {
 			onItemDespawned(event);
