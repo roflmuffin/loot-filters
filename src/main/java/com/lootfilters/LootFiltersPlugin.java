@@ -2,7 +2,6 @@ package com.lootfilters;
 
 import com.google.gson.Gson;
 import com.google.inject.Provides;
-import com.lootfilters.lang.Sources;
 import com.lootfilters.model.PluginTileItem;
 import lombok.Getter;
 import lombok.Setter;
@@ -36,7 +35,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static com.lootfilters.util.CollectionUtil.prepend;
 import static com.lootfilters.util.FilterUtil.withConfigMatchers;
 import static com.lootfilters.util.TextUtil.quote;
 import static net.runelite.client.util.ImageUtil.loadImageResource;
@@ -83,7 +81,7 @@ public class LootFiltersPlugin extends Plugin {
 
 	private LootFilter activeFilter;
 	private LootFilter currentAreaFilter;
-	private List<LootFilter> filters; // default + user
+	private List<LootFilter> parsedUserFilters;
 
 	@Setter private int hoveredItem = -1;
 	@Setter private boolean hotkeyActive = false;
@@ -106,13 +104,13 @@ public class LootFiltersPlugin extends Plugin {
 	}
 
 	public LootFilter getSelectedFilter() {
-		return filters.stream()
+		return parsedUserFilters.stream()
 				.filter(it -> it.getName().equals(getSelectedFilterName()))
 				.findFirst().orElse(LootFilter.Nop);
 	}
 
 	public boolean hasFilter(String name) {
-		return filters.stream().anyMatch(it -> it.getName().equals(name));
+		return parsedUserFilters.stream().anyMatch(it -> it.getName().equals(name));
 	}
 
 	public void addChatMessage(String msg) {
@@ -131,7 +129,8 @@ public class LootFiltersPlugin extends Plugin {
 
 		overlayManager.add(overlay);
 
-		reloadFilters();
+		parsedUserFilters = storageManager.loadFilters();
+		loadSelectedFilter();
 
 		pluginPanel = new LootFiltersPanel(this);
 		pluginPanelNav = NavigationButton.builder()
@@ -247,7 +246,7 @@ public class LootFiltersPlugin extends Plugin {
 		}
 
 		var p = WorldPoint.fromLocalInstance(client, player.getLocalLocation());
-		var match = filters.stream()
+		var match = parsedUserFilters.stream()
 				.filter(it -> it.isInActivationArea(p))
 				.findFirst().orElse(null);
 		if (match != null && (currentAreaFilter == null || !Objects.equals(match.getName(), currentAreaFilter.getName()))) {
@@ -260,7 +259,7 @@ public class LootFiltersPlugin extends Plugin {
 	}
 
 	public void reloadFilters() {
-		filters = prepend(Sources.getReferenceFilter(), storageManager.loadFilters());
+		parsedUserFilters = storageManager.loadFilters();
 		loadSelectedFilter();
 	}
 
