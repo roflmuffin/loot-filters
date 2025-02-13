@@ -1,7 +1,6 @@
 package com.lootfilters;
 
 import com.lootfilters.rule.FontType;
-import com.lootfilters.rule.Sound;
 import com.lootfilters.rule.TextAccent;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,7 +29,6 @@ public class DisplayConfig {
     private final boolean showDespawn;
     private final boolean notify;
     private final TextAccent textAccent;
-    private final Sound sound;
     private final Color textAccentColor;
     private final Color lootbeamColor;
     private final FontType fontType;
@@ -46,7 +44,6 @@ public class DisplayConfig {
         showDespawn = false;
         notify = false;
         textAccent = null;
-        sound = null;
         textAccentColor = null;
         lootbeamColor = null;
         fontType = null;

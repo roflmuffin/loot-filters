@@ -3,7 +3,19 @@ package com.lootfilters.lang;
 import com.lootfilters.DisplayConfig;
 import com.lootfilters.LootFilter;
 import com.lootfilters.MatcherConfig;
+<<<<<<< HEAD
 import com.lootfilters.rule.*;
+=======
+import com.lootfilters.rule.AndRule;
+import com.lootfilters.rule.Comparator;
+import com.lootfilters.rule.ItemIdRule;
+import com.lootfilters.rule.ItemNameRule;
+import com.lootfilters.rule.ItemQuantityRule;
+import com.lootfilters.rule.ItemValueRule;
+import com.lootfilters.rule.OrRule;
+import com.lootfilters.rule.Rule;
+import com.lootfilters.rule.TextAccent;
+>>>>>>> parent of d3b7cd6 (add drop sound filter config (#35))
 
 import java.util.ArrayList;
 import java.util.List;
@@ -154,8 +166,6 @@ public class Parser {
                     builder.notify(assign[1].expectBoolean()); break;
                 case "textAccent":
                     builder.textAccent(TextAccent.fromOrdinal(assign[1].expectInt())); break;
-                case "sound":
-                    builder.sound(new Sound.File(assign[1].expectString())); break;
                 case "textAccentColor":
                     builder.textAccentColor(parseArgb(assign[1].expectString())); break;
                 case "lootbeamColor":
