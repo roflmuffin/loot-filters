@@ -4,15 +4,6 @@ import com.lootfilters.DisplayConfig;
 import com.lootfilters.LootFilter;
 import com.lootfilters.MatcherConfig;
 import com.lootfilters.rule.*;
-import com.lootfilters.rule.AndRule;
-import com.lootfilters.rule.Comparator;
-import com.lootfilters.rule.ItemIdRule;
-import com.lootfilters.rule.ItemNameRule;
-import com.lootfilters.rule.ItemQuantityRule;
-import com.lootfilters.rule.ItemValueRule;
-import com.lootfilters.rule.OrRule;
-import com.lootfilters.rule.Rule;
-import com.lootfilters.rule.TextAccent;
 
 import java.util.ArrayList;
 import java.util.List;
