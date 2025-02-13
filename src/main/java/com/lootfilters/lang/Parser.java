@@ -3,9 +3,7 @@ package com.lootfilters.lang;
 import com.lootfilters.DisplayConfig;
 import com.lootfilters.LootFilter;
 import com.lootfilters.MatcherConfig;
-<<<<<<< HEAD
 import com.lootfilters.rule.*;
-=======
 import com.lootfilters.rule.AndRule;
 import com.lootfilters.rule.Comparator;
 import com.lootfilters.rule.ItemIdRule;
@@ -15,7 +13,6 @@ import com.lootfilters.rule.ItemValueRule;
 import com.lootfilters.rule.OrRule;
 import com.lootfilters.rule.Rule;
 import com.lootfilters.rule.TextAccent;
->>>>>>> parent of d3b7cd6 (add drop sound filter config (#35))
 
 import java.util.ArrayList;
 import java.util.List;
