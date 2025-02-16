@@ -140,21 +140,29 @@ Match based on an item's quantity.
 
 Match based on an item value. The value used for comparison is determined by plugin settings (GE, HA, or highest).
 
+#### tradeable `tradeable:true` or `tradeable:false`
+
+Match based on whether an item is tradeable.
+
 ### Display settings
 
 The following table lists the supported display settings for matchers:
 
-| name             | value type              | ordinal macros | description                                                                                          |
-|------------------|-------------------------|----------------|------------------------------------------------------------------------------------------------------|
-| hidden           | boolean                 |                | Whether this item is hidden in the overlay. When set to true, other display settings have no effect. |
-| color, textColor | string (ARGB color hex) |                | Color for the display text of the item.                                                              |
-| backgroundColor  | string (ARGB color hex) |                | Background color behind the display text.                                                            |
-| borderColor      | string (ARGB color hex) |                | Border color around the display text.                                                                |
-| showLootbeam     | boolean                 |                | Show an in-world lootbeam on the item's tile. The lootbeam color matches the configured text color.  |
-| showValue        | boolean                 |                | Include an item's value in the text overlay. The highest value between GE and HA price is chosen.    |
-| showDespawn      | boolean                 |                | Show a despawn timer, in game ticks, next to the text overlay.                                       |
-| notify           | boolean                 |                | Fire a system notification when the matched item drops.                                              |
-| textAccent       | enum                    | `TEXTACCENT_*` | Text accent to use:<li>1 = text shadow (default)</li><li>2 = outline</li>                            |
+| name                         | value type              | ordinal macros | description                                                                                          |
+|------------------------------|-------------------------|----------------|------------------------------------------------------------------------------------------------------|
+| hidden                       | boolean                 |                | Whether this item is hidden in the overlay. When set to true, other display settings have no effect. |
+| color, textColor             | string (ARGB color hex) |                | Color for the display text of the item.                                                              |
+| backgroundColor              | string (ARGB color hex) |                | Background color behind the display text.                                                            |
+| borderColor                  | string (ARGB color hex) |                | Border color around the display text.                                                                |
+| showLootbeam, showLootBeam   | boolean                 |                | Show an in-world lootbeam on the item's tile. The lootbeam color matches the configured text color.  |
+| showValue                    | boolean                 |                | Include an item's value in the text overlay. The highest value between GE and HA price is chosen.    |
+| showDespawn                  | boolean                 |                | Show a despawn timer, in game ticks, next to the text overlay.                                       |
+| notify                       | boolean                 |                | Fire a system notification when the matched item drops.                                              |
+| textAccent                   | enum                    | `TEXTACCENT_*` | Text accent to use:<li>1 = text shadow (default)</li><li>2 = outline</li><li>3 = none</li>           |
+| textAccentColor              | string (ARGB color hex) |                | Color for the text accent. Defaults to solid black.                                                  |
+| lootbeamColor, lootBeamColor | string (ARGB color hex) |                | Color for the lootbeam. Defaults to the text color when unset.                                       |
+| fontType                     | enum                    | `FONTTYPE_*`   | Font used for the display:<li>1 = normal overlay text size (default)</li><li>2 = larger              |
+| menuTextColor                | string (ARGB color hex) |                | Color for the menu entry text. Defaults to the text color when unset.                                | 
 
 ## Text macros
 
