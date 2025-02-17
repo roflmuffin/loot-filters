@@ -42,7 +42,7 @@ public class Token {
         if (type != Type.LITERAL_INT) {
             throw new ParseException("unexpected non-int token", this);
         }
-        return Integer.parseInt(value);
+        return Integer.parseInt(value.replace("_", ""));
     }
 
     public String expectString() {

@@ -201,7 +201,7 @@ public class Parser {
 
     private ItemIdRule parseItemIdRule() {
         var id = tokens.takeExpect(LITERAL_INT);
-        return new ItemIdRule(Integer.parseInt(id.getValue()));
+        return new ItemIdRule(id.expectInt());
     }
 
     private ItemNameRule parseItemNameRule() {
@@ -212,13 +212,13 @@ public class Parser {
     private ItemQuantityRule parseItemQuantityRule() {
         var op = tokens.take();
         var value = tokens.takeExpect(LITERAL_INT);
-        return new ItemQuantityRule(Integer.parseInt(value.getValue()), Comparator.fromToken(op));
+        return new ItemQuantityRule(value.expectInt(), Comparator.fromToken(op));
     }
 
     private ItemValueRule parseItemValueRule() {
         var op = tokens.take();
         var value = tokens.takeExpect(LITERAL_INT);
-        return new ItemValueRule(Integer.parseInt(value.getValue()), Comparator.fromToken(op));
+        return new ItemValueRule(value.expectInt(), Comparator.fromToken(op));
     }
 
     private ItemTradeableRule parseItemTradeableRule() {

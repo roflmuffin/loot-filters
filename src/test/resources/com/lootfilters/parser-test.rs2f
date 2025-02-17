@@ -8,18 +8,18 @@ meta {
 }
 
 // insane items
-if (value:>10000000) {
+if (value:>10_000_000) {
     color="ff8000";
     showLootbeam=true; // lootbeam
 }
-if (value:>1000000) {
+if (value:>1_000_000) {
     color="#a335ee";
     showLootbeam=true;
 }
-if (value:>100000) {
+if (value:>100_000) {
     color="ff0070dd";
 }
-if (value:>10000) {
+if (value:>10_000___) {
     color="#ff1eff00";
 }
 // end comment
