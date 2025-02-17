@@ -144,6 +144,10 @@ Match based on an item value. The value used for comparison is determined by plu
 
 Match based on whether an item is tradeable.
 
+#### stackable `stackable:true` or `stackable:false`
+
+Match based on whether an item is stackable (noted, coins, fishbait etc.).
+
 ### Display settings
 
 The following table lists the supported display settings for matchers:

@@ -43,6 +43,10 @@ public class ParserTest {
                 new MatcherConfig(new ItemTradeableRule(false),
                         DisplayConfig.builder()
                                 .textColor(new Color(0xff,0x80,0x00, 0xff))
+                                .build()),
+                new MatcherConfig(new ItemStackableRule(false),
+                        DisplayConfig.builder()
+                                .textColor(new Color(0xff,0x90,0x00, 0xff))
                                 .build())
         );
         var expect = new LootFilter(expectName, expectDesc, expectArea, expectMatchers);

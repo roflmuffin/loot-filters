@@ -27,3 +27,7 @@ if (value:>10000) {
 if (tradeable:false) {
     color="ffff8000";
 }
+
+if (stackable:false) {
+    color="ffff9000";
+}
