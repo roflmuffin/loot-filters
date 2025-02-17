@@ -116,6 +116,9 @@ public class Lexer {
 
     private void tokenizeLiteralInt() {
         for (int i = offset; i < input.length(); ++i) {
+            if (input.charAt(i) == '_') {
+                continue;
+            }
             if (!isNumeric(input.charAt(i))) {
                 var literal = input.substring(offset, i);
                 tokens.add(Token.intLiteral(literal));

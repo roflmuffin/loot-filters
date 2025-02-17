@@ -3,7 +3,18 @@ package com.lootfilters.lang;
 import com.lootfilters.DisplayConfig;
 import com.lootfilters.LootFilter;
 import com.lootfilters.MatcherConfig;
-import com.lootfilters.rule.*;
+import com.lootfilters.rule.AndRule;
+import com.lootfilters.rule.Comparator;
+import com.lootfilters.rule.FontType;
+import com.lootfilters.rule.ItemIdRule;
+import com.lootfilters.rule.ItemNameRule;
+import com.lootfilters.rule.ItemQuantityRule;
+import com.lootfilters.rule.ItemTradeableRule;
+import com.lootfilters.rule.ItemValueRule;
+import com.lootfilters.rule.NotRule;
+import com.lootfilters.rule.OrRule;
+import com.lootfilters.rule.Rule;
+import com.lootfilters.rule.TextAccent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +38,6 @@ import static com.lootfilters.lang.Token.Type.OP_AND;
 import static com.lootfilters.lang.Token.Type.OP_NOT;
 import static com.lootfilters.lang.Token.Type.OP_OR;
 import static com.lootfilters.lang.Token.Type.STMT_END;
-import static com.lootfilters.util.TextUtil.parseArgb;
 
 // Parser somewhat mixes canonical stages 2 (parse) and 3/4 (syntax/semantic analysis) but the filter language is
 // restricted enough that it should be fine for now.
@@ -143,11 +153,11 @@ public class Parser {
             switch (assign[0].getValue()) {
                 case "textColor":
                 case "color":
-                    builder.textColor(parseArgb(assign[1].expectString())); break;
+                    builder.textColor(assign[1].expectColor()); break;
                 case "backgroundColor":
-                    builder.backgroundColor(parseArgb(assign[1].expectString())); break;
+                    builder.backgroundColor(assign[1].expectColor()); break;
                 case "borderColor":
-                    builder.borderColor(parseArgb(assign[1].expectString())); break;
+                    builder.borderColor(assign[1].expectColor()); break;
                 case "hidden":
                     builder.hidden(assign[1].expectBoolean()); break;
                 case "showLootbeam":
@@ -162,14 +172,14 @@ public class Parser {
                 case "textAccent":
                     builder.textAccent(TextAccent.fromOrdinal(assign[1].expectInt())); break;
                 case "textAccentColor":
-                    builder.textAccentColor(parseArgb(assign[1].expectString())); break;
+                    builder.textAccentColor(assign[1].expectColor()); break;
                 case "lootbeamColor":
                 case "lootBeamColor":
-                    builder.lootbeamColor(parseArgb(assign[1].expectString())); break;
+                    builder.lootbeamColor(assign[1].expectColor()); break;
                 case "fontType":
                     builder.fontType(FontType.fromOrdinal(assign[1].expectInt())); break;
                 case "menuTextColor":
-                    builder.menuTextColor(parseArgb(assign[1].expectString())); break;
+                    builder.menuTextColor(assign[1].expectColor()); break;
                 default:
                     throw new ParseException("unexpected identifier in display config block", assign[0]);
             }
@@ -199,7 +209,7 @@ public class Parser {
 
     private ItemIdRule parseItemIdRule() {
         var id = tokens.takeExpect(LITERAL_INT);
-        return new ItemIdRule(Integer.parseInt(id.getValue()));
+        return new ItemIdRule(id.expectInt());
     }
 
     private ItemNameRule parseItemNameRule() {
@@ -210,13 +220,13 @@ public class Parser {
     private ItemQuantityRule parseItemQuantityRule() {
         var op = tokens.take();
         var value = tokens.takeExpect(LITERAL_INT);
-        return new ItemQuantityRule(Integer.parseInt(value.getValue()), Comparator.fromToken(op));
+        return new ItemQuantityRule(value.expectInt(), Comparator.fromToken(op));
     }
 
     private ItemValueRule parseItemValueRule() {
         var op = tokens.take();
         var value = tokens.takeExpect(LITERAL_INT);
-        return new ItemValueRule(Integer.parseInt(value.getValue()), Comparator.fromToken(op));
+        return new ItemValueRule(value.expectInt(), Comparator.fromToken(op));
     }
 
     private ItemTradeableRule parseItemTradeableRule() {
