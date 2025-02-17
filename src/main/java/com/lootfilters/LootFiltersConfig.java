@@ -338,4 +338,12 @@ public interface LootFiltersConfig extends Config {
             position = 24
     )
     default int hideTierValue() { return 0; }
+    @ConfigItem(
+            keyName = "hiddenNoHideUntradeables",
+            name = "Don't hide untradeables",
+            description = "Ignore untradeables for the hide-below-value tier.",
+            section = itemValueRules,
+            position = 25
+    )
+    default boolean hideTierShowUntradeable() { return true; }
 }
