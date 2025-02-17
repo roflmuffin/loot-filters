@@ -27,3 +27,16 @@ if (value:>10000) {
 if (tradeable:false) {
     color="ffff8000";
 }
+
+if (!name:"foo") {
+    hidden = true;
+}
+if (!(name:"foo")) {
+    hidden = true;
+}
+if (name:"foo" || !name:"bar") {
+    hidden = true;
+}
+if (name:"foo" && !(name:"bar" && !name:"baz")) {
+    hidden = true;
+}

@@ -24,6 +24,7 @@ import static com.lootfilters.lang.Token.Type.LITERAL_INT;
 import static com.lootfilters.lang.Token.Type.LITERAL_STRING;
 import static com.lootfilters.lang.Token.Type.META;
 import static com.lootfilters.lang.Token.Type.OP_AND;
+import static com.lootfilters.lang.Token.Type.OP_NOT;
 import static com.lootfilters.lang.Token.Type.OP_OR;
 import static com.lootfilters.lang.Token.Type.STMT_END;
 import static com.lootfilters.util.TextUtil.parseArgb;
@@ -102,6 +103,8 @@ public class Parser {
                         rulesPostfix.add(new AndRule(null));
                     } else if (op.is(OP_OR)) {
                         rulesPostfix.add(new OrRule(null));
+                    } else if (op.is(OP_NOT)) {
+                        rulesPostfix.add(new NotRule(null));
                     }
                 }
             } else if (it.is(OP_AND)) {
@@ -111,6 +114,8 @@ public class Parser {
                     operators.pop();
                     rulesPostfix.add(new AndRule(null));
                 }
+                operators.push(it);
+            } else if (it.is(OP_NOT)) {
                 operators.push(it);
             } else if (it.is(IDENTIFIER)) {
                 rulesPostfix.add(parseRule(it));
@@ -125,6 +130,8 @@ public class Parser {
                 rulesPostfix.add(new AndRule(null));
             } else if (op.is(OP_OR)) {
                 rulesPostfix.add(new OrRule(null));
+            } else if (op.is(OP_NOT)) {
+                rulesPostfix.add(new NotRule(null));
             }
         }
 
@@ -230,6 +237,8 @@ public class Parser {
                 operands.push(new AndRule(operands.pop(), operands.pop()));
             } else if (rule instanceof OrRule) {
                 operands.push(new OrRule(operands.pop(), operands.pop()));
+            } else if (rule instanceof NotRule) {
+                operands.push(new NotRule(operands.pop()));
             }
         }
 
