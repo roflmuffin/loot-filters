@@ -21,9 +21,7 @@ public class ItemStackableRule extends Rule {
         }
 
         var comp = plugin.getItemManager().getItemComposition(item.getId());
-        var linkedComp = plugin.getItemManager().getItemComposition(comp.getLinkedNoteId());
-        return target
-                ? comp.isStackable() || linkedComp.isStackable()
-                : !comp.isStackable() && !linkedComp.isStackable();
+
+        return target == comp.isStackable();
     }
 }
