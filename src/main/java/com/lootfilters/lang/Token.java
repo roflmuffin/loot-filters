@@ -2,6 +2,9 @@ package com.lootfilters.lang;
 
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
+import net.runelite.client.util.ColorUtil;
+
+import java.awt.Color;
 
 @Value
 @RequiredArgsConstructor
@@ -47,6 +50,18 @@ public class Token {
             throw new ParseException("unexpected non-string token", this);
         }
         return value;
+    }
+
+    public Color expectColor() {
+        if (type != Type.LITERAL_STRING) {
+            throw new ParseException("unexpected non-string token", this);
+        }
+
+        var color = ColorUtil.fromHex(value);
+        if (color == null) {
+            throw new ParseException("unexpected non-color string", this);
+        }
+        return color;
     }
 
     public boolean expectBoolean() {
