@@ -25,6 +25,7 @@ public class Lexer {
         put(">=", Token.Type.OP_GTEQ);
         put("<=", Token.Type.OP_LTEQ);
         put("==", Token.Type.OP_EQ);
+        put("!", Token.Type.OP_NOT);
         put(">", Token.Type.OP_GT);
         put("<", Token.Type.OP_LT);
         put(";", Token.Type.STMT_END);
