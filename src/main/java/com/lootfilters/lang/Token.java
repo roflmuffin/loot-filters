@@ -8,7 +8,7 @@ import lombok.Value;
 public class Token {
     public enum Type {
         WHITESPACE, NEWLINE,
-        IF,
+        IF, APPLY,
         META,
         COLON, COMMA,
         TRUE, FALSE,
