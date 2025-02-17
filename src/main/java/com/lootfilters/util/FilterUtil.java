@@ -47,7 +47,7 @@ public class FilterUtil {
                 config.enableLowItemValueTier(), config.lowValue(), config.lowValueColor(),
                 config.lootbeamTier().ordinal() >= ValueTier.LOW.ordinal(),
                 config.notifyTier().ordinal() >= ValueTier.LOW.ordinal()));
-        matchersWithConfig.add(MatcherConfig.hiddenTier(config.hideTierEnabled(), config.hideTierValue()));
+        matchersWithConfig.add(MatcherConfig.hiddenTier(config.hideTierEnabled(), config.hideTierValue(), config.hideTierShowUntradeable()));
 
         matchersWithConfig.add(MatcherConfig.showUnmatched(config.showUnmatchedItems()));
 

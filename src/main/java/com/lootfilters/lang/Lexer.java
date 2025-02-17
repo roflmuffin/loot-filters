@@ -25,6 +25,7 @@ public class Lexer {
         put(">=", Token.Type.OP_GTEQ);
         put("<=", Token.Type.OP_LTEQ);
         put("==", Token.Type.OP_EQ);
+        put("!", Token.Type.OP_NOT);
         put(">", Token.Type.OP_GT);
         put("<", Token.Type.OP_LT);
         put(";", Token.Type.STMT_END);
@@ -115,6 +116,9 @@ public class Lexer {
 
     private void tokenizeLiteralInt() {
         for (int i = offset; i < input.length(); ++i) {
+            if (input.charAt(i) == '_') {
+                continue;
+            }
             if (!isNumeric(input.charAt(i))) {
                 var literal = input.substring(offset, i);
                 tokens.add(Token.intLiteral(literal));

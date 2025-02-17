@@ -1,6 +1,7 @@
 package com.lootfilters;
 
 import com.lootfilters.model.DespawnTimerType;
+import com.lootfilters.model.DualValueDisplayType;
 import com.lootfilters.model.PluginTileItem;
 import com.lootfilters.util.TextComponent;
 import net.runelite.api.Client;
@@ -20,6 +21,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 
 import static com.lootfilters.util.TextUtil.abbreviate;
 import static java.util.stream.Collectors.counting;
@@ -67,11 +69,14 @@ public class LootFiltersOverlay extends Overlay {
 
             var tile = entry.getKey();
             var currentOffset = 0;
-            for (var id : itemCounts.keySet()) {
-                var count = itemCounts.get(id);
-                var item = items.stream()
-                        .filter(it -> it.getId() == id)
-                        .findFirst().orElseThrow();
+            var rendered = new ArrayList<Integer>();
+            for (var item : items) {
+                if (rendered.contains(item.getId())) {
+                    continue;
+                }
+                rendered.add(item.getId());
+
+                var count = itemCounts.get(item.getId());
 
                 var match = activeFilter.findMatch(plugin, item);
                 if (match == null) {
@@ -168,36 +173,34 @@ public class LootFiltersOverlay extends Overlay {
         }
 
         var isMoney = item.getId() == ItemID.COINS_995 || item.getId() == ItemID.PLATINUM_TOKEN; // value is redundant
-        if (!isMoney && display.isShowValue()) {
-            var ge = itemManager.getItemPrice(item.getId());
-            var ha = itemManager.getItemComposition(item.getId()).getHaPrice();
-            int value;
-            boolean isAlch;
-            switch (config.valueType()) {
-                case HIGHEST:
-                    value = Math.max(ge, ha);
-                    isAlch = ha > ge;
-                    break;
-                case GE:
-                    value = ge;
-                    isAlch = false;
-                    break;
-                default:
-                    value = ha;
-                    isAlch = true;
-                    break;
-            }
-            value *= item.getQuantity();
-            if (value > 0) {
-                text += " (";
-                if (isAlch) {
-                    text += "*";
-                }
-                text += abbreviate(value) + "gp)";
-            }
+        if (isMoney || !display.isShowValue()) {
+            return text;
         }
 
-        return text;
+        var ge = itemManager.getItemPrice(item.getId());
+        var ha = itemManager.getItemComposition(item.getId()).getHaPrice();
+        var geFmt = abbreviate(ge);
+        if (ge < 1000) {
+            geFmt += "gp";
+        }
+        var haFmt = abbreviate(ha);
+        if (ha < 1000) {
+            haFmt += "gp";
+        }
+        switch (config.valueDisplayType()) {
+            case HIGHEST:
+                var isAlch = ha > ge;
+                return String.format("%s (%s%s)", text, isAlch ? "*" : "", isAlch ? haFmt : geFmt);
+            case GE:
+                return String.format("%s (%s)", text, geFmt);
+            case HA:
+                return String.format("%s (%s)", text, haFmt);
+            default: // BOTH
+                if (config.dualValueDisplay() == DualValueDisplayType.COMPACT) {
+                    return String.format("%s (%s/*%s)", text, geFmt, haFmt);
+                } // VERBOSE
+                return String.format("%s (GE: %s, HA: %s)", text, geFmt, abbreviate(ha));
+        }
     }
 
     private void renderDebugOverlay(Graphics2D g) {

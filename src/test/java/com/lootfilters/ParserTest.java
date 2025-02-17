@@ -2,8 +2,15 @@ package com.lootfilters;
 
 import com.lootfilters.lang.Lexer;
 import com.lootfilters.lang.Parser;
+import com.lootfilters.rule.AndRule;
 import com.lootfilters.rule.Comparator;
-import com.lootfilters.rule.*;
+import com.lootfilters.rule.ItemNameRule;
+import com.lootfilters.rule.ItemNotedRule;
+import com.lootfilters.rule.ItemStackableRule;
+import com.lootfilters.rule.ItemTradeableRule;
+import com.lootfilters.rule.ItemValueRule;
+import com.lootfilters.rule.NotRule;
+import com.lootfilters.rule.OrRule;
 import org.junit.Test;
 
 import java.awt.Color;
@@ -50,7 +57,24 @@ public class ParserTest {
                 new MatcherConfig(new ItemNotedRule(false),
                         DisplayConfig.builder()
                                 .textColor(new Color(0xff,0x95,0x00, 0xff))
-                                .build())
+                                .build()),
+                new MatcherConfig(new NotRule(new ItemNameRule("foo")),
+                        DisplayConfig.builder().hidden(true).build()),
+                new MatcherConfig(new NotRule(new ItemNameRule("foo")),
+                        DisplayConfig.builder().hidden(true).build()),
+                new MatcherConfig(new OrRule(new NotRule(new ItemNameRule("bar")), new ItemNameRule("foo")),
+                        DisplayConfig.builder().hidden(true).build()),
+                new MatcherConfig(
+                        new AndRule(
+                                new NotRule(
+                                        new AndRule(
+                                                new NotRule(new ItemNameRule("baz")),
+                                                new ItemNameRule("bar")
+                                        )
+                                ),
+                                new ItemNameRule("foo")
+                        ),
+                        DisplayConfig.builder().hidden(true).build())
         );
         var expect = new LootFilter(expectName, expectDesc, expectArea, expectMatchers);
 

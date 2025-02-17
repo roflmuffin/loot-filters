@@ -1,7 +1,9 @@
 package com.lootfilters;
 
+import com.lootfilters.rule.AndRule;
 import com.lootfilters.rule.Comparator;
 import com.lootfilters.rule.ItemNameRule;
+import com.lootfilters.rule.ItemTradeableRule;
 import com.lootfilters.rule.ItemValueRule;
 import com.lootfilters.rule.OrRule;
 import com.lootfilters.rule.Rule;
@@ -83,8 +85,11 @@ public class MatcherConfig {
         return new MatcherConfig(rule, display);
     }
 
-    public static MatcherConfig hiddenTier(boolean enabled, int value) {
-        var inner = new ItemValueRule(value, Comparator.LT);
+    public static MatcherConfig hiddenTier(boolean enabled, int value, boolean showUntradeable) {
+        var valueRule = new ItemValueRule(value, Comparator.LT);
+        var inner = showUntradeable
+                ? new AndRule(valueRule, new ItemTradeableRule(true))
+                : valueRule;
         var rule = new Rule("") {
             @Override public boolean test(LootFiltersPlugin plugin, TileItem item) {
                 return enabled && inner.test(plugin, item);

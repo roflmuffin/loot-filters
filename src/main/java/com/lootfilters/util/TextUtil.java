@@ -1,6 +1,5 @@
 package com.lootfilters.util;
 
-import java.awt.Color;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -27,10 +26,6 @@ public class TextUtil {
 
     public static boolean isLegalIdent(char c) {
         return c == '_' || isAlpha(c) || isNumeric(c);
-    }
-
-    public static Color parseArgb(String argb) {
-        return new Color(Long.decode("0x" + argb).intValue(), true);
     }
 
     public static String abbreviate(int value) {
