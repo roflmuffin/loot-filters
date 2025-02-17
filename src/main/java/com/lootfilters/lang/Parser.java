@@ -187,6 +187,8 @@ public class Parser {
                 return parseItemTradeableRule();
             case "stackable":
                 return parseItemStackableRule();
+            case "noted":
+                return parseItemNotedRule();
             default:
                 throw new ParseException("unknown rule identifier", first);
         }
@@ -224,6 +226,11 @@ public class Parser {
         return new ItemStackableRule((op.expectBoolean()));
     }
 
+    private ItemNotedRule parseItemNotedRule() {
+        var op = tokens.take();
+        return new ItemNotedRule((op.expectBoolean()));
+    }
+
     private Rule buildRule(List<Rule> postfix) {
         var operands = new Stack<Rule>();
         for (var rule : postfix) {
@@ -232,7 +239,8 @@ public class Parser {
                     || rule instanceof ItemQuantityRule
                     || rule instanceof ItemValueRule
                     || rule instanceof ItemTradeableRule
-                    || rule instanceof ItemStackableRule) {
+                    || rule instanceof ItemStackableRule
+                    || rule instanceof ItemNotedRule) {
                 operands.push(rule);
             } else if (rule instanceof AndRule) {
                 operands.push(new AndRule(operands.pop(), operands.pop()));

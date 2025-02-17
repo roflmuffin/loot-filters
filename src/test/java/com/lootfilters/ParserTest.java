@@ -3,9 +3,7 @@ package com.lootfilters;
 import com.lootfilters.lang.Lexer;
 import com.lootfilters.lang.Parser;
 import com.lootfilters.rule.Comparator;
-import com.lootfilters.rule.ItemStackableRule;
-import com.lootfilters.rule.ItemTradeableRule;
-import com.lootfilters.rule.ItemValueRule;
+import com.lootfilters.rule.*;
 import org.junit.Test;
 
 import java.awt.Color;
@@ -48,6 +46,10 @@ public class ParserTest {
                 new MatcherConfig(new ItemStackableRule(false),
                         DisplayConfig.builder()
                                 .textColor(new Color(0xff,0x90,0x00, 0xff))
+                                .build()),
+                new MatcherConfig(new ItemNotedRule(false),
+                        DisplayConfig.builder()
+                                .textColor(new Color(0xff,0x95,0x00, 0xff))
                                 .build())
         );
         var expect = new LootFilter(expectName, expectDesc, expectArea, expectMatchers);

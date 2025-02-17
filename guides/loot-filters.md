@@ -148,6 +148,10 @@ Match based on whether an item is tradeable.
 
 Match based on whether an item is stackable (noted, coins, fishbait etc.).
 
+#### noted `noted:true` or `noted:false`
+
+Match based on whether an item is a note.
+
 ### Display settings
 
 The following table lists the supported display settings for matchers:
